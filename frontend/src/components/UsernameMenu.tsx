@@ -89,6 +89,14 @@ const {user,logout}=useAuth0();
         </DropdownMenuItem>
         <DropdownMenuItem>
         <Link
+        to="/join-group"
+        className='font-bold hover:text-orange-500'
+        >
+            Join Group Order
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
         to="/favorites"
         className='font-bold hover:text-orange-500'
         >

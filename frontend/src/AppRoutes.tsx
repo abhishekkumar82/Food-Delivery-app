@@ -17,6 +17,8 @@ import RewardsPage from "./Pages/RewardsPage";
 import SurpriseBagsPage from "./Pages/SurpriseBagsPage";
 import ManageSurpriseBagsPage from "./Pages/ManageSurpriseBagsPage";
 import SustainabilityPage from "./Pages/SustainabilityPage";
+import GroupOrderPage from "./Pages/GroupOrderPage";
+import JoinGroupPage from "./Pages/JoinGroupPage";
 
 
 const AppRoutes=()=>{
@@ -50,6 +52,8 @@ const AppRoutes=()=>{
                <Route path="/rewards" element={<Layout><RewardsPage/></Layout>} />
                <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
                <Route path="/my-impact" element={<Layout><SustainabilityPage/></Layout>} />
+               <Route path="/join-group" element={<Layout><JoinGroupPage/></Layout>} />
+               <Route path="/group/:code" element={<Layout><GroupOrderPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
                 </Route>            
             <Route path="*" element={<Navigate to="/" />} />

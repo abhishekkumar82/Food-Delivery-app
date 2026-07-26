@@ -226,6 +226,31 @@ export type MembershipResponse = {
   plans: MembershipPlan[];
 };
 
+export type GroupMember = { user: string; name: string };
+
+export type GroupItem = {
+  _id: string;
+  menuItemId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  addedBy?: string;
+  addedByName: string;
+};
+
+export type GroupOrder = {
+  _id: string;
+  code: string;
+  host: string;
+  restaurant:
+    | string
+    | { _id: string; restaurantName: string; city: string; imageUrl?: string };
+  members: GroupMember[];
+  items: GroupItem[];
+  status: "open" | "locked" | "placed";
+  createdAt: string;
+};
+
 export type Sustainability = {
   totalOrders: number;
   ecoOrders: number;

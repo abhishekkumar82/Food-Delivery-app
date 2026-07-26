@@ -3,6 +3,9 @@
 import { useCreateCheckoutSession, useCreateCodOrder } from "@/api/OrderApi";
 import { useGetRestaurant } from "@/api/RestaurantApi";
 import { useGetMyCart, useUpdateMyCart } from "@/api/CartApi";
+import { useCreateGroupOrder } from "@/api/GroupOrderApi";
+import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 import CheckoutButton from "@/components/CheckoutButton";
 import CheckoutOptions, { CheckoutSelections } from "@/components/CheckoutOptions";
 import MenuItem from "@/components/MenuItem";
@@ -31,7 +34,14 @@ const DetailPage = () => {
   const {restaurant,isLoading}=useGetRestaurant(restaurantId);
   const {createCheckoutSession,isLoading:isCheckoutLoading}=useCreateCheckoutSession();
   const {createCodOrder,isLoading:isCodLoading}=useCreateCodOrder();
+  const {createGroup,isLoading:isCreatingGroup}=useCreateGroupOrder();
   const {isAuthenticated}=useAuth0();
+
+  const startGroupOrder = async () => {
+    if (!restaurant) return;
+    const group = await createGroup(restaurant._id);
+    navigate(`/group/${group.code}`);
+  };
   // Tier 2: coupon / wallet / payment method / scheduling selections
   const [selections,setSelections]=useState<CheckoutSelections>({
     paymentMethod:"card",
@@ -201,8 +211,13 @@ return (
         {cartItems.length>0 && (
           <CheckoutOptions subtotal={subtotal} restaurantId={restaurant._id} onChange={setSelections} />
         )}
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-2">
       <CheckoutButton disabled={cartItems.length==0} onCheckout={onCheckout} isLoading={isCheckoutLoading||isCodLoading}/>
+      {isAuthenticated && (
+        <Button variant="outline" className="w-full" disabled={isCreatingGroup} onClick={startGroupOrder}>
+          <Users size={16} className="mr-1" /> Start a group order
+        </Button>
+      )}
     </CardFooter>
     </Card>
 </div>
