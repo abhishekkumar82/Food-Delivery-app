@@ -81,6 +81,7 @@ import cartRoute from "./route/CartRoute";
 import driverRoute from "./route/DriverRoute";
 import couponRoute from "./route/CouponRoute";
 import notificationRoute from "./route/NotificationRoute";
+import membershipRoute from "./route/MembershipRoute";
 import { setIO } from "./lib/socket";
 
 async function connectToMongoDB(connectionString: string) {
@@ -127,6 +128,8 @@ app.use("/api/driver", driverRoute);
 // ---- Tier 2 ----
 app.use("/api/coupon", couponRoute);
 app.use("/api/my/notifications", notificationRoute);
+// ---- Tier 3 ----
+app.use("/api/my/membership", membershipRoute);
 
 app.post('/api/order/checkout/webhook', OrderController.stripeWebhookHandler);
 

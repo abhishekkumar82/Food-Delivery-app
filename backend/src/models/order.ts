@@ -58,6 +58,9 @@ const orderSchema = new mongoose.Schema({
     discountAmount: { type: Number, default: 0 }, // minor units
   },
   walletApplied: { type: Number, default: 0 }, // minor units redeemed from wallet
+  // ---- Tier 3: membership perks applied to this order ----
+  memberDiscount: { type: Number, default: 0 }, // minor units off from membership
+  freeDelivery: { type: Boolean, default: false },
   loyaltyEarned: { type: Number, default: 0 },
   loyaltyAwarded: { type: Boolean, default: false },
   scheduledFor: { type: Date }, // null/undefined = ASAP

@@ -6,6 +6,7 @@ import User from "../models/user";
 import Coupon from "../models/coupon";
 import Cart from "../models/cart";
 import { computeDiscount } from "./CouponController";
+import { getMembershipPerks } from "./MembershipController";
 import { applyStatusChange } from "../lib/orderEffects";
 import { notify } from "../lib/notify";
 
@@ -235,6 +236,11 @@ const createCheckoutSession = async (req: Request, res: Response) => {
       checkoutSessionRequest.walletApplied
     );
 
+    // ---- Tier 3: membership perks (free delivery + extra % off) ----
+    const perks = await getMembershipPerks(req.userId);
+    const memberDiscount = Math.round((subtotal * perks.discountPercent) / 100);
+    const effectiveDelivery = perks.freeDelivery ? 0 : restaurant.deliveryPrice;
+
     const newOrder = new Order({
       restaurant: restaurant,
       user: req.userId,
@@ -246,6 +252,8 @@ const createCheckoutSession = async (req: Request, res: Response) => {
         ? { code: couponDoc.code, discountAmount }
         : { discountAmount: 0 },
       walletApplied,
+      memberDiscount,
+      freeDelivery: perks.freeDelivery,
       scheduledFor: checkoutSessionRequest.scheduledFor
         ? new Date(checkoutSessionRequest.scheduledFor)
         : undefined,
@@ -258,8 +266,8 @@ const createCheckoutSession = async (req: Request, res: Response) => {
       restaurant.menuItems
     );
 
-    // Apply coupon + wallet as a single one-off Stripe discount.
-    const totalOff = discountAmount + walletApplied;
+    // Apply coupon + wallet + membership discount as a single one-off Stripe discount.
+    const totalOff = discountAmount + walletApplied + memberDiscount;
     let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
     if (totalOff > 0) {
       const stripeCoupon = await STRIPE.coupons.create({
@@ -274,7 +282,7 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     const session = await createSession(
       lineItems,
       newOrder._id.toString(),
-      restaurant.deliveryPrice,
+      effectiveDelivery,
       restaurant._id.toString(),
       discounts
     );
@@ -316,9 +324,14 @@ const createCodOrder = async (req: Request, res: Response) => {
       body.walletApplied
     );
 
+    // ---- Tier 3: membership perks ----
+    const perks = await getMembershipPerks(req.userId);
+    const memberDiscount = Math.round((subtotal * perks.discountPercent) / 100);
+    const effectiveDelivery = perks.freeDelivery ? 0 : restaurant.deliveryPrice;
+
     const totalAmount = Math.max(
       0,
-      subtotal + restaurant.deliveryPrice - discountAmount - walletApplied
+      subtotal + effectiveDelivery - discountAmount - walletApplied - memberDiscount
     );
 
     const newOrder = new Order({
@@ -331,6 +344,8 @@ const createCodOrder = async (req: Request, res: Response) => {
       totalAmount,
       coupon: couponDoc ? { code: couponDoc.code, discountAmount } : { discountAmount: 0 },
       walletApplied,
+      memberDiscount,
+      freeDelivery: perks.freeDelivery,
       scheduledFor: body.scheduledFor ? new Date(body.scheduledFor) : undefined,
       statusHistory: [{ status: "placed", at: new Date() }],
       createdAt: new Date(),

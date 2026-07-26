@@ -203,6 +203,29 @@ export type AppNotification = {
 };
 
 // ---- Tier 3 ----
+export type MembershipPlan = {
+  id: "gold" | "pro";
+  name: string;
+  price: number;
+  durationDays: number;
+  discountPercent: number;
+  freeDelivery: boolean;
+  perks: string[];
+};
+
+export type Membership = {
+  plan: "none" | "gold" | "pro";
+  active: boolean;
+  startedAt?: string;
+  expiresAt?: string;
+};
+
+export type MembershipResponse = {
+  membership: Membership;
+  walletBalance: number;
+  plans: MembershipPlan[];
+};
+
 export type RestaurantAnalytics = {
   totalRevenue: number;
   totalOrders: number;

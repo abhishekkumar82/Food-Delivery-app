@@ -55,6 +55,17 @@ const userSchema = new mongoose.Schema({
     balance: { type: Number, default: 0 }, // stored in minor units (pence/paise)
   },
   loyaltyPoints: { type: Number, default: 0 },
+  // ---- Tier 3: membership / subscription ----
+  membership: {
+    plan: {
+      type: String,
+      enum: ["none", "gold", "pro"],
+      default: "none",
+    },
+    active: { type: Boolean, default: false },
+    startedAt: { type: Date },
+    expiresAt: { type: Date },
+  },
   walletTransactions: {
     type: [
       new mongoose.Schema(

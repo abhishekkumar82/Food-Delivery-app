@@ -49,6 +49,14 @@ const {user,logout}=useAuth0();
         </DropdownMenuItem>
         <DropdownMenuItem>
         <Link
+        to="/membership"
+        className='font-bold hover:text-orange-500'
+        >
+            Membership
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
         to="/favorites"
         className='font-bold hover:text-orange-500'
         >
