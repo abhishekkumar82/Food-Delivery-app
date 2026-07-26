@@ -58,5 +58,23 @@ export const validateMyRestaurantRequest = [
   body("menuItems.*.price")
     .isFloat({ min: 0 })
     .withMessage("Menu item price is required and must be a postive number"),
+  // ---- Tier 1: richer menu items (all optional) ----
+  body("menuItems.*.foodType")
+    .optional()
+    .isIn(["veg", "non-veg", "egg", "vegan"])
+    .withMessage("Invalid food type"),
+  body("menuItems.*.spiceLevel")
+    .optional()
+    .isIn(["none", "mild", "medium", "hot", "extra-hot"])
+    .withMessage("Invalid spice level"),
+  handleValidationErrors,
+];
+
+// ---- Tier 1: review validation ----
+export const validateReviewRequest = [
+  body("rating")
+    .isInt({ min: 1, max: 5 })
+    .withMessage("Rating must be between 1 and 5"),
+  body("comment").optional().isString(),
   handleValidationErrors,
 ];

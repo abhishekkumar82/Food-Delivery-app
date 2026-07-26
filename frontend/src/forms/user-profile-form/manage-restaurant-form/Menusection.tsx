@@ -24,9 +24,9 @@ const Menusection = () => {
               <MenuItemInput index={index} removeMenuItem={()=> remove(index)}/>
            ))}
         </FormItem>}  />
-        <Button 
+        <Button
         type="button"
-        onClick={()=>append({name:"" ,price:""})}
+        onClick={()=>append({name:"" ,price:"",description:"",category:"Others",foodType:"veg",spiceLevel:"none",isBestseller:false,inStock:true})}
         > add menu item</Button>
     </div>
   )

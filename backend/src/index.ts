@@ -69,13 +69,19 @@ import cors from 'cors';
 import "dotenv/config";
 import bodyParser from 'body-parser';
 import mongoose from "mongoose";
+import http from "http";
+import { Server } from "socket.io";
 import { v2 as cloudinary } from "cloudinary";
 import myRestaurantRoute from "./route/MyResturantRoute";
 import myUserRoute from "./route/MyUserRoute";
 import restaurantRoute from "./route/RestaurantRoute";
 import OrderController from "./controllers/OrderController";
 import orderRoute from "./route/OrderRoute";
-import stripeWebhookHandler from './controllers/OrderController';
+import cartRoute from "./route/CartRoute";
+import driverRoute from "./route/DriverRoute";
+import couponRoute from "./route/CouponRoute";
+import notificationRoute from "./route/NotificationRoute";
+import { setIO } from "./lib/socket";
 
 async function connectToMongoDB(connectionString: string) {
     await mongoose.connect(connectionString);
@@ -116,6 +122,11 @@ app.use("/api/my/user", myUserRoute);
 app.use("/api/my/restaurant", myRestaurantRoute);
 app.use("/api/restaurant", restaurantRoute);
 app.use("/api/order", orderRoute);
+app.use("/api/my/cart", cartRoute);
+app.use("/api/driver", driverRoute);
+// ---- Tier 2 ----
+app.use("/api/coupon", couponRoute);
+app.use("/api/my/notifications", notificationRoute);
 
 app.post('/api/order/checkout/webhook', OrderController.stripeWebhookHandler);
 
@@ -123,6 +134,26 @@ app.get("/test", async (req: Request, res: Response) => {
     res.json({ message: "Hello" });
 });
 
-app.listen(7000, () => {
+// ---- Tier 2: Socket.io real-time layer (live order tracking + notifications) ----
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: { origin: "*" },
+});
+setIO(io);
+
+io.on("connection", (socket) => {
+    // client joins a room per user (for notifications) and per order (for tracking)
+    socket.on("joinUser", (userId: string) => {
+        if (userId) socket.join(`user:${userId}`);
+    });
+    socket.on("joinOrder", (orderId: string) => {
+        if (orderId) socket.join(`order:${orderId}`);
+    });
+    socket.on("leaveOrder", (orderId: string) => {
+        if (orderId) socket.leave(`order:${orderId}`);
+    });
+});
+
+server.listen(7000, () => {
     console.log("server started on localhost:7000");
 });

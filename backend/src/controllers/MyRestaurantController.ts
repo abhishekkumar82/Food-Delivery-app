@@ -3,6 +3,7 @@ import Restaurant from "../models/restaurant";
 import cloudinary from "cloudinary"
 import mongoose from "mongoose";
 import Order from "../models/order";
+import { applyStatusChange } from "../lib/orderEffects";
 
 const getMyRestaurant=async(req:Request,res:Response)=>{
     try {
@@ -105,11 +106,12 @@ const updateOrderStatus=async(req:Request,res:Response)=>{
     if(restaurant?.user?._id.toString()!==req.userId){
       return res.status(401).send();
     }
-    order.status=status;
-    await order.save();
+    // records history, awards loyalty on delivery, emits socket + notification
+    await applyStatusChange(order, status);
     res.status(200).json(order);
   } catch (error) {
-    
+    console.log(error);
+    res.status(500).json({message:"something went wrong"});
   }
 }
 

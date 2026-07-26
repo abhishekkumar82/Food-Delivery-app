@@ -1,7 +1,8 @@
 import { Restaurant } from "@/types";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { Banknote, Clock, Dot } from "lucide-react";
+import { Banknote, Clock, Dot, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import FavoriteButton from "./FavoriteButton";
 
 type Props={
     restaurant:Restaurant;
@@ -12,15 +13,27 @@ type Props={
 
 const SearchResultCard = ({restaurant}:Props) => {
   return (
-    <Link  
+    <Link
      to={`/detail/${restaurant._id}`}
      className="grid lg:grid-cols-[2fr_3fr] gap-5 group "
     >
     <AspectRatio>
-        <img 
+        <img
         src={restaurant.imageUrl}
         className="rounded-md w-full h-full object-cover"
         />
+        <div className="absolute right-2 top-2">
+          <FavoriteButton restaurantId={restaurant._id} />
+        </div>
+        {restaurant.averageRating !== undefined && restaurant.averageRating > 0 && (
+          <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-sm font-semibold shadow">
+            <Star size={14} className="fill-amber-400 text-amber-400" />
+            {restaurant.averageRating.toFixed(1)}
+            <span className="text-xs font-normal text-gray-500">
+              ({restaurant.reviewCount ?? 0})
+            </span>
+          </div>
+        )}
     </AspectRatio>
     <div >
         <h3  className="text-2xl font-bold tracking-tight mb-2 group-hover:underline">

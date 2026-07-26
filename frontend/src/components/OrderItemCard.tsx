@@ -1,4 +1,3 @@
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Order, OrderStatus } from "@/types";
 import { Separator } from './ui/separator';
@@ -8,6 +7,7 @@ import { ORDER_STATUS } from '@/config/order-status-config';
 import { Badge } from './ui/badge';
 import { Label } from './ui/label';
 import {  useUpdateMyRestaurantOrder } from '@/api/MyRestaurantApi';
+import { useAssignDriver, useGetAvailableDrivers } from '@/api/DriverApi';
 import { useEffect,  useState } from "react";
 type Props={
    order:Order;
@@ -15,10 +15,16 @@ type Props={
 const OrderItemCard = ({order}:Props) => {
 
 const {updateRestaurantStatus,isLoading}=useUpdateMyRestaurantOrder();
+const {drivers}=useGetAvailableDrivers();
+const {assignDriver,isLoading:isAssigning}=useAssignDriver();
 const [status,setStatus]=useState<OrderStatus>(order.status);
 useEffect(() => {
   setStatus(order.status);
 }, [order.status]);
+
+const handleAssignDriver = async (driverId: string) => {
+  await assignDriver({ orderId: order._id as string, driverId });
+};
 
 const handleStatusChange = async (newStatus: OrderStatus) => {
   await updateRestaurantStatus({
@@ -89,6 +95,32 @@ const handleStatusChange = async (newStatus: OrderStatus) => {
                 {ORDER_STATUS.map((status)=>(<SelectItem value={status.value}>{status.label}</SelectItem>))}
             </SelectContent>
            </Select>
+        </div>
+
+        {/* ---- Tier 1: assign a delivery rider ---- */}
+        <div className='flex flex-col space-y-1.5'>
+           <Label htmlFor="driver">Assign delivery rider</Label>
+           {order.driver ? (
+             <span className='text-sm font-semibold text-green-600'>
+               Assigned: {order.driver.name} ({order.driver.vehicleType})
+             </span>
+           ) : (
+             <Select
+               disabled={isAssigning || !drivers || drivers.length === 0}
+               onValueChange={handleAssignDriver}
+             >
+              <SelectTrigger id="driver">
+                <SelectValue placeholder={drivers && drivers.length > 0 ? "Select a rider" : "No riders available"} />
+              </SelectTrigger>
+              <SelectContent position='popper'>
+                  {drivers?.map((driver)=>(
+                    <SelectItem key={driver._id} value={driver._id}>
+                      {driver.name} — {driver.vehicleType}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+             </Select>
+           )}
         </div>
       </CardContent>
     </Card>

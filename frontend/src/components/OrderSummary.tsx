@@ -10,17 +10,19 @@ type Props={
     restaurant:Restaurant;
     cartItems:CartItem[];
     removeFromCart:(cartItem:CartItem) => void;
+    discountAmount?:number;
+    walletApplied?:number;
 }
 
 
-const OrderSummary = ({restaurant,cartItems,removeFromCart}:Props) => {
+const OrderSummary = ({restaurant,cartItems,removeFromCart,discountAmount=0,walletApplied=0}:Props) => {
 
       const getTotalCost=()=>{
      const   totalInPence=cartItems.reduce((total,cartItem)=> total+cartItem.price*cartItem.quantity,0
     )
-       const totalWithDelivery=totalInPence+restaurant.deliveryPrice
+       const totalWithDelivery=totalInPence+restaurant.deliveryPrice-discountAmount-walletApplied
 
-       return (totalWithDelivery/100).toFixed(2);
+       return (Math.max(0,totalWithDelivery)/100).toFixed(2);
       }
   return (
     <>
@@ -54,6 +56,18 @@ const OrderSummary = ({restaurant,cartItems,removeFromCart}:Props) => {
               <span>Delivery</span>
               <span> ${(restaurant.deliveryPrice/100).toFixed(2)} </span>
            </div>
+           {discountAmount>0 && (
+             <div className="flex justify-between text-green-600">
+               <span>Coupon discount</span>
+               <span>-${(discountAmount/100).toFixed(2)}</span>
+             </div>
+           )}
+           {walletApplied>0 && (
+             <div className="flex justify-between text-green-600">
+               <span>Wallet</span>
+               <span>-${(walletApplied/100).toFixed(2)}</span>
+             </div>
+           )}
            <Separator/>
       </CardContent>
     </>

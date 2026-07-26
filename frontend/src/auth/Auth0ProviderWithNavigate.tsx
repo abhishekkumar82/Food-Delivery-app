@@ -1,8 +1,6 @@
 
-// useCreateMyUser from "@/api/MyUserApi": This imports a custom hook for creating a user, possibly from a custom API.
-import { useCreateMyUser } from "@/api/MyUserApi";
-// AppState, Auth0Provider, and User from "@auth0/auth0-react": These imports are necessary for working with Auth0 authentication in a React application.
-import { AppState, Auth0Provider, User } from "@auth0/auth0-react";
+// AppState, Auth0Provider from "@auth0/auth0-react": necessary for working with Auth0 authentication in a React application.
+import { AppState, Auth0Provider } from "@auth0/auth0-react";
 import {  useNavigate } from "react-router-dom";
 
 type Props={
@@ -25,7 +23,7 @@ const Auth0ProviderWithNavigate=({children}:Props)=>{
         // For example, if the user was on a particular page before initiating the authentication process, you can use appState to redirect them back to that page after authentication is completed.
         // This parameter provides information about the authenticated user.
         // After a successful authentication flow, the user parameter contains details such as the user's profile information, authentication tokens, or any additional metadata associated with the user. 
-         const onRedirectCallback=(appState?:AppState,user?:User)=>{
+         const onRedirectCallback=(appState?:AppState)=>{
               navigate(appState?.returnTo || "/auth-callback"); 
          };
 

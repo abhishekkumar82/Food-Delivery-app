@@ -2,7 +2,7 @@
 import landingImage from "../assets/landing.png"
 import appDownloadImage from "../assets/appDownload.png";
 import SearchBar, { SearchForm } from "@/components/SearchBar";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const HomePage = () => {
 const navigate=useNavigate();
   const handleSearchSubmit=(searchFormValues:SearchForm)=>{
@@ -17,7 +17,7 @@ const navigate=useNavigate();
             Tuck into a takeway today
         </h1>
         <span className="text-xl ">Food is just a click away! </span>
-        <SearchBar placeHolder="Search by city or town" onSubmit={handleSearchSubmit}/>
+        <SearchBar searchQuery="" placeHolder="Search by city or town" onSubmit={handleSearchSubmit}/>
       </div>
       <div className="grid md:grid-cols-2 gap-5">
       <img src={landingImage}  />

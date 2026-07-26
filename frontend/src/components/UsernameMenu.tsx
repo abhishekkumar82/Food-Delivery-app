@@ -31,6 +31,30 @@ const {user,logout}=useAuth0();
             User Profile
         </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
+        to="/address-book"
+        className='font-bold hover:text-orange-500'
+        >
+            My Addresses
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
+        to="/favorites"
+        className='font-bold hover:text-orange-500'
+        >
+            My Favorites
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
+        to="/wallet"
+        className='font-bold hover:text-orange-500'
+        >
+            Wallet & Rewards
+        </Link>
+        </DropdownMenuItem>
         <Separator/>
         <DropdownMenuItem>
              <Button onClick={()=> logout()} className="flex flex-1 font-bold bg-orange-500">Log Out</Button>

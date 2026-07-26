@@ -7,8 +7,10 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import ManageRestaurantPage from "./Pages/ManageRestaurantPage";
 import SearchPage from "./Pages/SearchPage";
 import DetailPage from "./Pages/DetailPage";
-import OrderStatusHeader from "./components/OrderStatusHeader";
 import OrderStatusPage from "./Pages/OrderStatusPage";
+import AddressBookPage from "./Pages/AddressBookPage";
+import FavoritesPage from "./Pages/FavoritesPage";
+import WalletPage from "./Pages/WalletPage";
 
 
 const AppRoutes=()=>{
@@ -29,6 +31,9 @@ const AppRoutes=()=>{
                <Route element={<ProtectedRoute/>}>
                <Route path="/order-status" element={<Layout><OrderStatusPage/></Layout>} />
                <Route path="/user-profile" element={<Layout><UserProfilePage/></Layout>} />
+               <Route path="/address-book" element={<Layout><AddressBookPage/></Layout>} />
+               <Route path="/favorites" element={<Layout><FavoritesPage/></Layout>} />
+               <Route path="/wallet" element={<Layout><WalletPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
                 </Route>            
             <Route path="*" element={<Navigate to="/" />} />

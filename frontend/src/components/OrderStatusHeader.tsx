@@ -1,5 +1,4 @@
 import { Order } from '@/types';
-import React from 'react'
 import { Progress } from './ui/progress';
 import { ORDER_STATUS } from '@/config/order-status-config';
 

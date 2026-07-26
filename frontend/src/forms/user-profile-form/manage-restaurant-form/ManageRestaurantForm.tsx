@@ -36,6 +36,12 @@ const formSchema=z.object({
     menuItems:z.array(z.object({
         name:z.string().min(1,"name is required"),
         price :z.coerce.number().min(1,"price is required"),
+        description:z.string().optional(),
+        category:z.string().optional(),
+        foodType:z.enum(["veg","non-veg","egg","vegan"]).optional(),
+        spiceLevel:z.enum(["none","mild","medium","hot","extra-hot"]).optional(),
+        isBestseller:z.boolean().optional(),
+        inStock:z.boolean().optional(),
     })) ,
     imageUrl:z.string().optional(),
    imageFile:z.instanceof(File,{message:"image is required"}).optional(),
@@ -59,7 +65,7 @@ const ManageRestaurantForm = ({restaurant,onSave,isLoading}:Props) => {
     resolver:zodResolver(formSchema),
     defaultValues:{
         cuisines:[],
-        menuItems:[{name:"",price:0}],
+        menuItems:[{name:"",price:0,description:"",category:"Others",foodType:"veg",spiceLevel:"none",isBestseller:false,inStock:true}],
     },
   });
 
@@ -102,6 +108,12 @@ const ManageRestaurantForm = ({restaurant,onSave,isLoading}:Props) => {
             formData.append(
                 `menuItems[${index}][price]`,
                 (menuItem.price*100).toString())
+            formData.append(`menuItems[${index}][description]`,menuItem.description || "")
+            formData.append(`menuItems[${index}][category]`,menuItem.category || "Others")
+            formData.append(`menuItems[${index}][foodType]`,menuItem.foodType || "veg")
+            formData.append(`menuItems[${index}][spiceLevel]`,menuItem.spiceLevel || "none")
+            formData.append(`menuItems[${index}][isBestseller]`,(menuItem.isBestseller ? "true" : "false"))
+            formData.append(`menuItems[${index}][inStock]`,(menuItem.inStock === false ? "false" : "true"))
         });
         if(formDataJson.imageFile){
         formData.append(`imageFile`,formDataJson.imageFile);
@@ -126,7 +138,4 @@ const ManageRestaurantForm = ({restaurant,onSave,isLoading}:Props) => {
 };
 
 export default ManageRestaurantForm
-function refine(arg0: (data: any) => any, arg1: {}) {
-    throw new Error("Function not implemented.");
-}
 
