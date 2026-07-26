@@ -24,6 +24,8 @@ router.get(
   );
 
 router.get("/",jwtCheck,jwtParse,MyRestaurantController.getMyRestaurant);
+// ---- Tier 3: analytics dashboard ----
+router.get("/analytics",jwtCheck,jwtParse,MyRestaurantController.getRestaurantAnalytics);
 router.patch("/order/:orderId/status",jwtCheck,jwtParse,MyRestaurantController.updateOrderStatus);
 router.post(
     "/",

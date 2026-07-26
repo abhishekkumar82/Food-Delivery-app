@@ -25,6 +25,14 @@ const {user,logout}=useAuth0();
         </DropdownMenuItem>
         <DropdownMenuItem>
         <Link
+        to="/analytics"
+        className='font-bold hover:text-orange-500'
+        >
+           Analytics
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
         to="/user-profile"
         className='font-bold hover:text-orange-500'
         >

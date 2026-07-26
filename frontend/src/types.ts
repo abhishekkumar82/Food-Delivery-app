@@ -202,6 +202,16 @@ export type AppNotification = {
   createdAt: string;
 };
 
+// ---- Tier 3 ----
+export type RestaurantAnalytics = {
+  totalRevenue: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  statusBreakdown: Record<string, number>;
+  topItems: { name: string; quantity: number }[];
+  last7Days: { date: string; revenue: number; orders: number }[];
+};
+
 export type RestaurantSearchResponse = {
   data: Restaurant[];
   pagination: {

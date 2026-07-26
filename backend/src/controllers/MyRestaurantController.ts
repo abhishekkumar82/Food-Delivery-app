@@ -115,11 +115,90 @@ const updateOrderStatus=async(req:Request,res:Response)=>{
   }
 }
 
+// ---- Tier 3: restaurant analytics dashboard ----
+// GET /api/my/restaurant/analytics -> revenue, orders, top items, trends
+const getRestaurantAnalytics = async (req: Request, res: Response) => {
+  try {
+    const restaurant = await Restaurant.findOne({ user: req.userId });
+    if (!restaurant) {
+      return res.status(404).json({ message: "restaurant not found" });
+    }
+
+    const orders = await Order.find({ restaurant: restaurant._id });
+
+    // orders that represent real revenue (paid or fulfilled, not cancelled)
+    const revenueOrders = orders.filter(
+      (o) => o.status !== "placed" && o.status !== "cancelled"
+    );
+
+    const totalRevenue = revenueOrders.reduce(
+      (sum, o) => sum + (o.totalAmount || 0),
+      0
+    );
+    const totalOrders = orders.length;
+    const avgOrderValue =
+      revenueOrders.length > 0
+        ? Math.round(totalRevenue / revenueOrders.length)
+        : 0;
+
+    // status breakdown
+    const statusBreakdown: Record<string, number> = {};
+    orders.forEach((o) => {
+      statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
+    });
+
+    // top menu items by quantity ordered
+    const itemMap: Record<string, { name: string; quantity: number }> = {};
+    orders.forEach((o) => {
+      o.cartItems.forEach((ci: any) => {
+        const key = ci.name;
+        if (!itemMap[key]) itemMap[key] = { name: ci.name, quantity: 0 };
+        itemMap[key].quantity += ci.quantity || 0;
+      });
+    });
+    const topItems = Object.values(itemMap)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
+    // revenue for the last 7 days (daily buckets)
+    const days: { date: string; revenue: number; orders: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const day = new Date();
+      day.setHours(0, 0, 0, 0);
+      day.setDate(day.getDate() - i);
+      const next = new Date(day);
+      next.setDate(day.getDate() + 1);
+
+      const dayOrders = revenueOrders.filter((o) => {
+        const created = new Date(o.createdAt as any);
+        return created >= day && created < next;
+      });
+      days.push({
+        date: day.toISOString().slice(0, 10),
+        revenue: dayOrders.reduce((s, o) => s + (o.totalAmount || 0), 0),
+        orders: dayOrders.length,
+      });
+    }
+
+    res.json({
+      totalRevenue,
+      totalOrders,
+      avgOrderValue,
+      statusBreakdown,
+      topItems,
+      last7Days: days,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 const uploadImage = async (file: Express.Multer.File) => {
     const image = file;
     const base64Image = Buffer.from(image.buffer).toString("base64");
     const dataURI = `data:${image.mimetype};base64,${base64Image}`;
-  
+
     const uploadResponse = await cloudinary.v2.uploader.upload(dataURI);
     return uploadResponse.url;
   };
@@ -129,4 +208,5 @@ const uploadImage = async (file: Express.Multer.File) => {
     createMyRestaurant,
     getMyRestaurant,
     updateMyRestaurant,
+    getRestaurantAnalytics,
 }
