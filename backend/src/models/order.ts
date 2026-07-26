@@ -61,6 +61,9 @@ const orderSchema = new mongoose.Schema({
   // ---- Tier 3: membership perks applied to this order ----
   memberDiscount: { type: Number, default: 0 }, // minor units off from membership
   freeDelivery: { type: Boolean, default: false },
+  // ---- Tier 3: sustainability ----
+  ecoPackaging: { type: Boolean, default: false }, // opted for eco-friendly packaging
+  carbonGrams: { type: Number, default: 0 }, // estimated CO2 footprint of this order
   loyaltyEarned: { type: Number, default: 0 },
   loyaltyAwarded: { type: Boolean, default: false },
   scheduledFor: { type: Date }, // null/undefined = ASAP

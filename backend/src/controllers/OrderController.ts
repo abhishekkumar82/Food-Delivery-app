@@ -70,6 +70,19 @@ type CheckoutSessionRequest = {
   walletApplied?: number; // minor units the user wants to redeem
   scheduledFor?: string; // ISO date string, optional
   paymentMethod?: "card" | "cod" | "upi" | "wallet";
+  // ---- Tier 3 ----
+  ecoPackaging?: boolean;
+};
+
+// Rough CO2 estimate for an order: a base delivery footprint + per-item cost,
+// minus a saving when the customer opts into eco-friendly packaging.
+const estimateCarbon = (cartItems: IncomingCartItem[], eco?: boolean) => {
+  const itemCount = cartItems.reduce(
+    (n, ci) => n + (parseInt(ci.quantity) || 0),
+    0
+  );
+  const grams = 500 + itemCount * 200 - (eco ? 150 : 0);
+  return Math.max(0, grams);
 };
 
 // ---- helpers ----------------------------------------------------------------
@@ -254,6 +267,11 @@ const createCheckoutSession = async (req: Request, res: Response) => {
       walletApplied,
       memberDiscount,
       freeDelivery: perks.freeDelivery,
+      ecoPackaging: !!checkoutSessionRequest.ecoPackaging,
+      carbonGrams: estimateCarbon(
+        checkoutSessionRequest.cartItems,
+        checkoutSessionRequest.ecoPackaging
+      ),
       scheduledFor: checkoutSessionRequest.scheduledFor
         ? new Date(checkoutSessionRequest.scheduledFor)
         : undefined,
@@ -346,6 +364,8 @@ const createCodOrder = async (req: Request, res: Response) => {
       walletApplied,
       memberDiscount,
       freeDelivery: perks.freeDelivery,
+      ecoPackaging: !!body.ecoPackaging,
+      carbonGrams: estimateCarbon(body.cartItems, body.ecoPackaging),
       scheduledFor: body.scheduledFor ? new Date(body.scheduledFor) : undefined,
       statusHistory: [{ status: "placed", at: new Date() }],
       createdAt: new Date(),

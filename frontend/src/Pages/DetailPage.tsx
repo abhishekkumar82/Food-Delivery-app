@@ -158,6 +158,8 @@ const addToCart = (menuItem: menuItem) => {
         walletApplied:selections.walletApplied,
         scheduledFor:selections.scheduledFor,
         paymentMethod:selections.paymentMethod,
+        // ---- Tier 3 ----
+        ecoPackaging:selections.ecoPackaging,
       };
 
       if(selections.paymentMethod==="card"){

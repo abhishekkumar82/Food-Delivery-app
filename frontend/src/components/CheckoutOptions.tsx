@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
-import { Tag, Wallet, X } from "lucide-react";
+import { Leaf, Tag, Wallet, X } from "lucide-react";
 
 export type CheckoutSelections = {
   paymentMethod: "card" | "cod" | "upi";
@@ -13,6 +13,7 @@ export type CheckoutSelections = {
   discountAmount: number;
   walletApplied: number;
   scheduledFor?: string;
+  ecoPackaging?: boolean;
 };
 
 type Props = {
@@ -32,6 +33,7 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
     useState<CheckoutSelections["paymentMethod"]>("card");
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [scheduledFor, setScheduledFor] = useState("");
+  const [ecoPackaging, setEcoPackaging] = useState(false);
 
   const walletBalance = wallet?.balance ?? 0;
   const discountAmount = applied?.discountAmount ?? 0;
@@ -46,6 +48,7 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
       discountAmount,
       walletApplied,
       scheduledFor: scheduleEnabled && scheduledFor ? scheduledFor : undefined,
+      ecoPackaging,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -55,6 +58,7 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
     walletApplied,
     scheduleEnabled,
     scheduledFor,
+    ecoPackaging,
   ]);
 
   const handleApply = async () => {
@@ -155,6 +159,17 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
           {radio("upi", "📱 UPI")}
         </div>
       </div>
+
+      {/* Eco-friendly packaging */}
+      <label className="flex cursor-pointer items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={ecoPackaging}
+          onChange={(e) => setEcoPackaging(e.target.checked)}
+        />
+        <Leaf size={14} className="text-green-600" />
+        Use eco-friendly packaging 🌱
+      </label>
 
       {/* Schedule */}
       <div>

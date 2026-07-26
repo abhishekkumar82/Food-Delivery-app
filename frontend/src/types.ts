@@ -226,6 +226,16 @@ export type MembershipResponse = {
   plans: MembershipPlan[];
 };
 
+export type Sustainability = {
+  totalOrders: number;
+  ecoOrders: number;
+  mealsRescued: number;
+  totalCarbonKg: number;
+  carbonSavedKg: number;
+  treesEquivalent: number;
+  kmNotDriven: number;
+};
+
 export type SurpriseBag = {
   _id: string;
   restaurant:

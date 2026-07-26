@@ -73,6 +73,14 @@ const {user,logout}=useAuth0();
         </DropdownMenuItem>
         <DropdownMenuItem>
         <Link
+        to="/my-impact"
+        className='font-bold hover:text-orange-500'
+        >
+            My Green Impact
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
         to="/surprise-bags"
         className='font-bold hover:text-orange-500'
         >

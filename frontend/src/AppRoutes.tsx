@@ -16,6 +16,7 @@ import MembershipPage from "./Pages/MembershipPage";
 import RewardsPage from "./Pages/RewardsPage";
 import SurpriseBagsPage from "./Pages/SurpriseBagsPage";
 import ManageSurpriseBagsPage from "./Pages/ManageSurpriseBagsPage";
+import SustainabilityPage from "./Pages/SustainabilityPage";
 
 
 const AppRoutes=()=>{
@@ -48,6 +49,7 @@ const AppRoutes=()=>{
                <Route path="/membership" element={<Layout><MembershipPage/></Layout>} />
                <Route path="/rewards" element={<Layout><RewardsPage/></Layout>} />
                <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
+               <Route path="/my-impact" element={<Layout><SustainabilityPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
                 </Route>            
             <Route path="*" element={<Navigate to="/" />} />
