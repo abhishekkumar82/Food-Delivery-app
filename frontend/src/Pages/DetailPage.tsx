@@ -12,6 +12,7 @@ import MenuItem from "@/components/MenuItem";
 import OrderSummary from "@/components/OrderSummary";
 import RestaurantInfo from "@/components/RestaurantInfo";
 import ReviewSection from "@/components/ReviewSection";
+import AiReviewSummary from "@/components/AiReviewSummary";
 import { Card, CardFooter } from "@/components/ui/card";
 import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
 import { menuItem } from "@/types";
@@ -203,6 +204,7 @@ return (
                  {restaurant.menuItems.map((menuItem)=>(
                     <MenuItem menuItem={menuItem} addToCart={()=>addToCart(menuItem)} />
                  ))}
+                 <AiReviewSummary restaurantId={restaurant._id} />
                  <ReviewSection restaurantId={restaurant._id} />
             </div>
 <div>

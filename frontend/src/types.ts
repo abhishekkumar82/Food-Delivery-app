@@ -226,6 +226,22 @@ export type MembershipResponse = {
   plans: MembershipPlan[];
 };
 
+// ---- Tier 3: AI features ----
+export type Recommendation = {
+  restaurant: Restaurant;
+  reason: string;
+};
+
+export type ReviewSummary = {
+  available: boolean;
+  source?: "ai" | "stats";
+  averageRating?: number;
+  reviewCount?: number;
+  summary?: string;
+  pros?: string[];
+  cons?: string[];
+};
+
 export type GroupMember = { user: string; name: string };
 
 export type GroupItem = {

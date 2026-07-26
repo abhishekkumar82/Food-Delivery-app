@@ -19,6 +19,8 @@ import ManageSurpriseBagsPage from "./Pages/ManageSurpriseBagsPage";
 import SustainabilityPage from "./Pages/SustainabilityPage";
 import GroupOrderPage from "./Pages/GroupOrderPage";
 import JoinGroupPage from "./Pages/JoinGroupPage";
+import AiSearchPage from "./Pages/AiSearchPage";
+import RecommendationsPage from "./Pages/RecommendationsPage";
 
 
 const AppRoutes=()=>{
@@ -41,6 +43,11 @@ const AppRoutes=()=>{
                     <SurpriseBagsPage/>
                 </Layout>
             } />
+             <Route path="/ai-search" element={
+                <Layout showHero={false}>
+                    <AiSearchPage/>
+                </Layout>
+            } />
                <Route element={<ProtectedRoute/>}>
                <Route path="/order-status" element={<Layout><OrderStatusPage/></Layout>} />
                <Route path="/user-profile" element={<Layout><UserProfilePage/></Layout>} />
@@ -50,6 +57,7 @@ const AppRoutes=()=>{
                <Route path="/analytics" element={<Layout><AnalyticsPage/></Layout>} />
                <Route path="/membership" element={<Layout><MembershipPage/></Layout>} />
                <Route path="/rewards" element={<Layout><RewardsPage/></Layout>} />
+               <Route path="/recommendations" element={<Layout><RecommendationsPage/></Layout>} />
                <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
                <Route path="/my-impact" element={<Layout><SustainabilityPage/></Layout>} />
                <Route path="/join-group" element={<Layout><JoinGroupPage/></Layout>} />

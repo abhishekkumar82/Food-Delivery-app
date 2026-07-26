@@ -86,6 +86,7 @@ import gamificationRoute from "./route/GamificationRoute";
 import surpriseBagRoute from "./route/SurpriseBagRoute";
 import sustainabilityRoute from "./route/SustainabilityRoute";
 import groupOrderRoute from "./route/GroupOrderRoute";
+import aiRoute from "./route/AiRoute";
 import { setIO } from "./lib/socket";
 
 async function connectToMongoDB(connectionString: string) {
@@ -138,6 +139,7 @@ app.use("/api/my/gamification", gamificationRoute);
 app.use("/api/surprise-bags", surpriseBagRoute);
 app.use("/api/my/sustainability", sustainabilityRoute);
 app.use("/api/group-orders", groupOrderRoute);
+app.use("/api/ai", aiRoute);
 
 app.post('/api/order/checkout/webhook', OrderController.stripeWebhookHandler);
 

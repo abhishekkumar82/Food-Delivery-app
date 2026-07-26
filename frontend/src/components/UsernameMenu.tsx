@@ -73,6 +73,22 @@ const {user,logout}=useAuth0();
         </DropdownMenuItem>
         <DropdownMenuItem>
         <Link
+        to="/recommendations"
+        className='font-bold hover:text-orange-500'
+        >
+            ✨ For You
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
+        to="/ai-search"
+        className='font-bold hover:text-orange-500'
+        >
+            ✨ AI Search
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
         to="/my-impact"
         className='font-bold hover:text-orange-500'
         >
