@@ -33,6 +33,14 @@ const {user,logout}=useAuth0();
         </DropdownMenuItem>
         <DropdownMenuItem>
         <Link
+        to="/manage-surprise-bags"
+        className='font-bold hover:text-orange-500'
+        >
+           Manage Surprise Bags
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
         to="/user-profile"
         className='font-bold hover:text-orange-500'
         >
@@ -61,6 +69,14 @@ const {user,logout}=useAuth0();
         className='font-bold hover:text-orange-500'
         >
             Rewards
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+        <Link
+        to="/surprise-bags"
+        className='font-bold hover:text-orange-500'
+        >
+            Surprise Bags
         </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>

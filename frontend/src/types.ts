@@ -226,6 +226,23 @@ export type MembershipResponse = {
   plans: MembershipPlan[];
 };
 
+export type SurpriseBag = {
+  _id: string;
+  restaurant:
+    | string
+    | { _id: string; restaurantName: string; city: string; imageUrl?: string };
+  title: string;
+  description: string;
+  originalPrice: number;
+  price: number;
+  quantity: number;
+  pickupStart: string;
+  pickupEnd: string;
+  foodType: "veg" | "non-veg" | "mixed";
+  isActive: boolean;
+  createdAt: string;
+};
+
 export type Badge = {
   id: string;
   name: string;

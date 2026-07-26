@@ -14,6 +14,8 @@ import WalletPage from "./Pages/WalletPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
 import MembershipPage from "./Pages/MembershipPage";
 import RewardsPage from "./Pages/RewardsPage";
+import SurpriseBagsPage from "./Pages/SurpriseBagsPage";
+import ManageSurpriseBagsPage from "./Pages/ManageSurpriseBagsPage";
 
 
 const AppRoutes=()=>{
@@ -31,6 +33,11 @@ const AppRoutes=()=>{
                     <DetailPage/>
                 </Layout>
             } />
+             <Route path="/surprise-bags" element={
+                <Layout showHero={false}>
+                    <SurpriseBagsPage/>
+                </Layout>
+            } />
                <Route element={<ProtectedRoute/>}>
                <Route path="/order-status" element={<Layout><OrderStatusPage/></Layout>} />
                <Route path="/user-profile" element={<Layout><UserProfilePage/></Layout>} />
@@ -40,6 +47,7 @@ const AppRoutes=()=>{
                <Route path="/analytics" element={<Layout><AnalyticsPage/></Layout>} />
                <Route path="/membership" element={<Layout><MembershipPage/></Layout>} />
                <Route path="/rewards" element={<Layout><RewardsPage/></Layout>} />
+               <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
                 </Route>            
             <Route path="*" element={<Navigate to="/" />} />
