@@ -13,6 +13,7 @@ import FavoritesPage from "./Pages/FavoritesPage";
 import WalletPage from "./Pages/WalletPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
 import MembershipPage from "./Pages/MembershipPage";
+import RewardsPage from "./Pages/RewardsPage";
 
 
 const AppRoutes=()=>{
@@ -38,6 +39,7 @@ const AppRoutes=()=>{
                <Route path="/wallet" element={<Layout><WalletPage/></Layout>} />
                <Route path="/analytics" element={<Layout><AnalyticsPage/></Layout>} />
                <Route path="/membership" element={<Layout><MembershipPage/></Layout>} />
+               <Route path="/rewards" element={<Layout><RewardsPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
                 </Route>            
             <Route path="*" element={<Navigate to="/" />} />

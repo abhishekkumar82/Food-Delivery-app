@@ -226,6 +226,35 @@ export type MembershipResponse = {
   plans: MembershipPlan[];
 };
 
+export type Badge = {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  earned: boolean;
+  progress: number;
+  goal: number;
+};
+
+export type Gamification = {
+  level: number;
+  xp: number;
+  xpIntoLevel: number;
+  xpForNextLevel: number;
+  currentStreak: number;
+  longestStreak: number;
+  stats: {
+    totalOrders: number;
+    totalReviews: number;
+    distinctRestaurants: number;
+    currentStreak: number;
+    longestStreak: number;
+    totalSpent: number;
+  };
+  badges: Badge[];
+  earnedCount: number;
+};
+
 export type RestaurantAnalytics = {
   totalRevenue: number;
   totalOrders: number;
