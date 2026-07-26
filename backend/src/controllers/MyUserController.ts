@@ -60,8 +60,103 @@ const updateCurrentUser=async (req:Request,res:Response)=>{
     }
 }
 
+// ---- Tier 1: address book ----
+
+// GET /api/my/user/addresses
+const getAddresses = async (req: Request, res: Response) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user.addresses);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "something went wrong" });
+    }
+};
+
+// POST /api/my/user/addresses -> add a new saved address
+const addAddress = async (req: Request, res: Response) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // if this is the first address, or flagged default, make it the default
+        const makeDefault = req.body.isDefault || user.addresses.length === 0;
+        if (makeDefault) {
+            user.addresses.forEach((a) => (a.isDefault = false));
+        }
+
+        user.addresses.push({ ...req.body, isDefault: makeDefault });
+        await user.save();
+        res.status(201).json(user.addresses);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "something went wrong" });
+    }
+};
+
+// PUT /api/my/user/addresses/:addressId -> edit an address
+const updateAddress = async (req: Request, res: Response) => {
+    try {
+        const { addressId } = req.params;
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const address = user.addresses.id(addressId);
+        if (!address) {
+            return res.status(404).json({ message: "Address not found" });
+        }
+
+        if (req.body.isDefault) {
+            user.addresses.forEach((a) => (a.isDefault = false));
+        }
+        address.set(req.body);
+        await user.save();
+        res.json(user.addresses);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "something went wrong" });
+    }
+};
+
+// DELETE /api/my/user/addresses/:addressId
+const deleteAddress = async (req: Request, res: Response) => {
+    try {
+        const { addressId } = req.params;
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const address = user.addresses.id(addressId);
+        if (!address) {
+            return res.status(404).json({ message: "Address not found" });
+        }
+        const wasDefault = address.isDefault;
+        address.deleteOne();
+        // promote the first remaining address to default if needed
+        if (wasDefault && user.addresses.length > 0) {
+            user.addresses[0].isDefault = true;
+        }
+        await user.save();
+        res.json(user.addresses);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "something went wrong" });
+    }
+};
+
 export default {
     getCurrentUser,
     createCurrentUser,
     updateCurrentUser,
+    getAddresses,
+    addAddress,
+    updateAddress,
+    deleteAddress,
 }

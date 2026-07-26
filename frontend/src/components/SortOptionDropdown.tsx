@@ -13,6 +13,10 @@ const SORT_OPTIONS=[
         value:"bestmatch",
     },
     {
+        label:"Top rated",
+        value:"averageRating",
+    },
+    {
         label:"Delivery price",
         value:"deliveryprice",
     },

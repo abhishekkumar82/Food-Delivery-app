@@ -6,6 +6,7 @@ import CheckoutButton from "@/components/CheckoutButton";
 import MenuItem from "@/components/MenuItem";
 import OrderSummary from "@/components/OrderSummary";
 import RestaurantInfo from "@/components/RestaurantInfo";
+import ReviewSection from "@/components/ReviewSection";
 import { Card, CardFooter } from "@/components/ui/card";
 import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
 import { menuItem } from "@/types";
@@ -115,6 +116,7 @@ return (
                  {restaurant.menuItems.map((menuItem)=>(
                     <MenuItem menuItem={menuItem} addToCart={()=>addToCart(menuItem)} />
                  ))}
+                 <ReviewSection restaurantId={restaurant._id} />
             </div>
 <div>
     <Card>

@@ -75,6 +75,8 @@ import myUserRoute from "./route/MyUserRoute";
 import restaurantRoute from "./route/RestaurantRoute";
 import OrderController from "./controllers/OrderController";
 import orderRoute from "./route/OrderRoute";
+import cartRoute from "./route/CartRoute";
+import driverRoute from "./route/DriverRoute";
 import stripeWebhookHandler from './controllers/OrderController';
 
 async function connectToMongoDB(connectionString: string) {
@@ -116,6 +118,8 @@ app.use("/api/my/user", myUserRoute);
 app.use("/api/my/restaurant", myRestaurantRoute);
 app.use("/api/restaurant", restaurantRoute);
 app.use("/api/order", orderRoute);
+app.use("/api/my/cart", cartRoute);
+app.use("/api/driver", driverRoute);
 
 app.post('/api/order/checkout/webhook', OrderController.stripeWebhookHandler);
 

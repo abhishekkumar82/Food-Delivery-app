@@ -55,8 +55,12 @@ const searchRestaurant=async(req:Request,res:Response)=>{
         const pageSize=10;
         const skip=(page-1)*pageSize;
 
+        // Higher-is-better fields sort descending; everything else ascending.
+        const descendingSorts = ["averageRating", "reviewCount"];
+        const sortDirection = descendingSorts.includes(sortOption) ? -1 : 1;
+
         const restaurants=await Restaurant.find(query)
-        .sort({[sortOption]:1})
+        .sort({[sortOption]:sortDirection})
         .skip(skip)
         .limit(pageSize)
         .lean();

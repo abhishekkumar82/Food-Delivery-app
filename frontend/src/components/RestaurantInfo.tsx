@@ -1,6 +1,7 @@
 import { Restaurant } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Dot } from "lucide-react"
+import StarRating from "./StarRating"
 
 // import React from 'react'
 type Props={
@@ -13,6 +14,12 @@ const RestaurantInfo = ({restaurant}:Props) => {
         <CardTitle>
             {restaurant.restaurantName}
         </CardTitle>
+        <StarRating
+          rating={restaurant.averageRating ?? 0}
+          reviewCount={restaurant.reviewCount}
+          showValue
+          size={16}
+        />
         <CardDescription>
             {restaurant.city} ,{restaurant.country}
         </CardDescription>
