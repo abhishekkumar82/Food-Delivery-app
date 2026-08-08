@@ -9,5 +9,6 @@ router.post("/checkout/create-checkout-session",jwtCheck,jwtParse,OrderControlle
 // ---- Tier 2: cash-on-delivery / UPI checkout & reorder ----
 router.post("/checkout/cod",jwtCheck,jwtParse,OrderController.createCodOrder);
 router.post("/reorder/:orderId",jwtCheck,jwtParse,OrderController.reorder);
+router.post("/:orderId/cancel",jwtCheck,jwtParse,OrderController.cancelOrder);
 router.post("/checkout/webhook",OrderController.stripeWebhookHandler);
 export default router;

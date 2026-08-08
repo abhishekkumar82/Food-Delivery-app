@@ -20,7 +20,8 @@ const getMyOrders = async (req: Request, res: Response) => {
       .populate("restaurant")
       .populate("user")
       .populate("driver")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .limit(100);
 
     res.json(orders);
   } catch (error) {
@@ -502,6 +503,48 @@ const createSession = async (
   return sessionData;
 };
 
+// POST /api/order/:orderId/cancel -> customer cancels an early-stage order
+const cancelOrder = async (req: Request, res: Response) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.orderId,
+      user: req.userId,
+    });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    // only cancellable before the kitchen/rider is committed
+    const cancellable = ["placed", "paid", "confirmed"];
+    if (!cancellable.includes(order.status)) {
+      return res
+        .status(400)
+        .json({ message: "This order can no longer be cancelled" });
+    }
+
+    // refund any wallet balance that was redeemed on the order
+    if (order.walletApplied && order.walletApplied > 0 && order.user) {
+      await User.findByIdAndUpdate(order.user, {
+        $inc: { "wallet.balance": order.walletApplied },
+        $push: {
+          walletTransactions: {
+            type: "credit",
+            amount: order.walletApplied,
+            reason: `Refund for cancelled order ${order._id
+              .toString()
+              .slice(-6)}`,
+          },
+        },
+      });
+    }
+
+    await applyStatusChange(order, "cancelled");
+    res.json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 export default {
   createCheckoutSession,
   createCodOrder,
@@ -509,4 +552,5 @@ export default {
   getMyOrders,
   getMyOrder,
   reorder,
+  cancelOrder,
 };

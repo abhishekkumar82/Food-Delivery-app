@@ -135,6 +135,34 @@ export const useReorder = () => {
   return { reorder, isLoading };
 };
 
+// Cancel an early-stage order (refunds any wallet used).
+export const useCancelOrder = () => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const request = async (orderId: string) => {
+    const accessToken = await getAccessTokenSilently();
+    const response = await fetch(`${API_BASE_URL}/api/order/${orderId}/cancel`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Could not cancel order");
+    return data;
+  };
+
+  const { mutateAsync: cancelOrder, isLoading } = useMutation(request, {
+    onSuccess: () => {
+      toast.success("Order cancelled");
+      queryClient.invalidateQueries("fetchMyOrders");
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
+  });
+  return { cancelOrder, isLoading };
+};
+
 export const useCreateCheckoutSession = () => {
   const { getAccessTokenSilently } = useAuth0();
 

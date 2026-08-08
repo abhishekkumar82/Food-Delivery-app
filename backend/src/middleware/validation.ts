@@ -78,3 +78,42 @@ export const validateReviewRequest = [
   body("comment").optional().isString(),
   handleValidationErrors,
 ];
+
+// ---- Tier 3 validators ----
+export const validateMembershipRequest = [
+  body("planId").isIn(["gold", "pro"]).withMessage("Invalid membership plan"),
+  handleValidationErrors,
+];
+
+export const validateSurpriseBagRequest = [
+  body("title").isString().notEmpty().withMessage("Title is required"),
+  body("originalPrice")
+    .isInt({ min: 1 })
+    .withMessage("Original price must be a positive amount"),
+  body("price").isInt({ min: 0 }).withMessage("Price must be a valid amount"),
+  body("quantity").isInt({ min: 1 }).withMessage("Quantity must be at least 1"),
+  handleValidationErrors,
+];
+
+export const validateGroupCreateRequest = [
+  body("restaurantId").isString().notEmpty().withMessage("restaurantId is required"),
+  handleValidationErrors,
+];
+
+export const validateGroupJoinRequest = [
+  body("code").isString().notEmpty().withMessage("Invite code is required"),
+  handleValidationErrors,
+];
+
+export const validateGroupItemRequest = [
+  body("menuItemId").isString().notEmpty(),
+  body("name").isString().notEmpty(),
+  body("price").isInt({ min: 0 }),
+  body("quantity").optional().isInt({ min: 1 }),
+  handleValidationErrors,
+];
+
+export const validateAiSearchRequest = [
+  body("query").isString().notEmpty().withMessage("query is required"),
+  handleValidationErrors,
+];

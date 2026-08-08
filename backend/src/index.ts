@@ -1,5 +1,7 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from 'cors';
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import "dotenv/config";
 import bodyParser from 'body-parser';
 import mongoose from "mongoose";
@@ -50,6 +52,18 @@ const app = express();
 const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(cors({ origin: allowedOrigin, credentials: true }));
 
+// security response headers
+app.use(helmet());
+
+// basic API rate limiting (generous — polling clients make frequent requests)
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api", apiLimiter);
+
 // Apply raw body parser specifically for Stripe webhook endpoint
 app.use('/api/order/checkout/webhook', bodyParser.raw({ type: 'application/json' }));
 
@@ -81,6 +95,17 @@ app.post('/api/order/checkout/webhook', OrderController.stripeWebhookHandler);
 
 app.get("/test", async (req: Request, res: Response) => {
     res.json({ message: "Hello" });
+});
+
+// unknown API routes return JSON instead of an HTML error page
+app.use("/api", (_req: Request, res: Response) => {
+    res.status(404).json({ message: "Route not found" });
+});
+
+// centralized error handler — must be the last middleware (4 args)
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    console.error("Unhandled error:", err);
+    res.status(err?.status || 500).json({ message: "Internal server error" });
 });
 
 // ---- Tier 2: Socket.io real-time layer (live order tracking + notifications) ----

@@ -34,7 +34,7 @@ const BADGES: BadgeDef[] = [
 ];
 
 // consecutive-calendar-day streak from a set of order day-strings (YYYY-MM-DD)
-const computeStreaks = (dayKeys: string[]) => {
+export const computeStreaks = (dayKeys: string[]) => {
   const uniqueDays = Array.from(new Set(dayKeys)).sort(); // ascending
   if (uniqueDays.length === 0) return { currentStreak: 0, longestStreak: 0 };
 
