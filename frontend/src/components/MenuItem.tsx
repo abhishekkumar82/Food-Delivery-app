@@ -1,9 +1,9 @@
-// import React from 'react'
 import { menuItem } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { FOOD_TYPES } from "@/config/menu-options-config";
 import StarRating from "./StarRating";
+import { onImageError } from "@/lib/imageFallback";
 
 type Props = {
   menuItem: menuItem;
@@ -33,41 +33,53 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
 
   return (
     <Card
-      className={`${outOfStock ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+      className={outOfStock ? "cursor-not-allowed opacity-60" : "cursor-pointer"}
       onClick={outOfStock ? undefined : addToCart}
     >
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <FoodTypeIndicator menuItem={menuItem} />
-          {menuItem.name}
-          {menuItem.isBestseller && (
-            <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-              ⭐ Bestseller
-            </Badge>
+      <div className="flex gap-3 p-4">
+        <div className="flex flex-1 flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2 text-lg font-semibold">
+            <FoodTypeIndicator menuItem={menuItem} />
+            {menuItem.name}
+            {menuItem.isBestseller && (
+              <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                ⭐ Bestseller
+              </Badge>
+            )}
+            {outOfStock && (
+              <Badge variant="outline" className="text-red-500">
+                Out of stock
+              </Badge>
+            )}
+          </div>
+
+          {menuItem.averageRating !== undefined && menuItem.averageRating > 0 && (
+            <StarRating
+              rating={menuItem.averageRating}
+              reviewCount={menuItem.reviewCount}
+              showValue
+              size={13}
+            />
           )}
-          {outOfStock && (
-            <Badge variant="outline" className="text-red-500">
-              Out of stock
-            </Badge>
+
+          <span className="font-bold">£{(menuItem.price / 100).toFixed(2)}</span>
+
+          {menuItem.description && (
+            <span className="text-sm font-normal text-gray-500">
+              {menuItem.description}
+            </span>
           )}
-        </CardTitle>
-        {menuItem.averageRating !== undefined && menuItem.averageRating > 0 && (
-          <StarRating
-            rating={menuItem.averageRating}
-            reviewCount={menuItem.reviewCount}
-            showValue
-            size={13}
+        </div>
+
+        {menuItem.imageUrl && (
+          <img
+            src={menuItem.imageUrl}
+            alt={menuItem.name}
+            onError={onImageError}
+            className="h-24 w-24 shrink-0 rounded-md object-cover"
           />
         )}
-      </CardHeader>
-      <CardContent className="flex flex-col gap-1">
-        <span className="font-bold">£{(menuItem.price / 100).toFixed(2)}</span>
-        {menuItem.description && (
-          <span className="text-sm font-normal text-gray-500">
-            {menuItem.description}
-          </span>
-        )}
-      </CardContent>
+      </div>
     </Card>
   );
 };
