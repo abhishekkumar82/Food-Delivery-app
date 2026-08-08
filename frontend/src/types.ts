@@ -11,10 +11,13 @@ export type Address = {
   isDefault: boolean;
 };
 
+export type UserRole = "customer" | "owner" | "admin";
+
 export type User = {
   _id: string;
   email: string;
   name: string;
+  role?: UserRole;
   addressLine1: string;
   city: string;
   country: string;

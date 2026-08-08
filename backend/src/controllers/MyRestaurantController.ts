@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
 import Restaurant from "../models/restaurant";
+import User from "../models/user";
 import cloudinary from "cloudinary"
 import mongoose from "mongoose";
 import Order from "../models/order";
@@ -36,7 +37,14 @@ const createMyRestaurant = async (req: Request, res: Response) => {
       restaurant.user = new mongoose.Types.ObjectId(req.userId);
       restaurant.lastUpdated = new Date();
       await restaurant.save();
-  
+
+      // becoming a partner promotes the account to the "owner" role
+      // (don't downgrade an admin who also runs a restaurant)
+      await User.updateOne(
+        { _id: req.userId, role: "customer" },
+        { role: "owner" }
+      );
+
       res.status(201).send(restaurant);
     } catch (error) {
       console.log(error);

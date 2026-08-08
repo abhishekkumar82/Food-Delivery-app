@@ -1,6 +1,6 @@
 import { Order, Restaurant } from "@/types";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { toast } from "sonner";
 
 const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
@@ -61,13 +61,20 @@ export const useCreateMyRestaurant = () => {
       return response.json();
     };
   
+    const queryClient = useQueryClient();
     const {
       mutate: createRestaurant,
       isLoading,
       isSuccess,
       error,
-    } = useMutation(createMyRestaurantRequest);
-  
+    } = useMutation(createMyRestaurantRequest, {
+      // creating a restaurant promotes the account to "owner" — refresh role
+      onSuccess: () => {
+        queryClient.invalidateQueries("fetchCurrentUser");
+        queryClient.invalidateQueries("fetchMyRestaurant");
+      },
+    });
+
     if (isSuccess) {
       toast.success("Restaurant created!");
     }

@@ -6,6 +6,9 @@ import AuthCallbackPage from "./Pages/AuthCallbackPage";
 import UserProfilePage from "./Pages/UserProfilePage";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import OwnerRoute from "./auth/OwnerRoute";
+import AdminRoute from "./auth/AdminRoute";
+import AdminPage from "./Pages/AdminPage";
+import PartnerPage from "./Pages/PartnerPage";
 import ManageRestaurantPage from "./Pages/ManageRestaurantPage";
 import SearchPage from "./Pages/SearchPage";
 import DetailPage from "./Pages/DetailPage";
@@ -62,11 +65,16 @@ const AppRoutes=()=>{
                <Route path="/my-impact" element={<Layout><SustainabilityPage/></Layout>} />
                <Route path="/join-group" element={<Layout><JoinGroupPage/></Layout>} />
                <Route path="/group/:code" element={<Layout><GroupOrderPage/></Layout>} />
+               <Route path="/partner" element={<Layout><PartnerPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
-                    {/* owner-only pages: require the user to own a restaurant */}
+                    {/* owner-only pages: require the owner (or admin) role */}
                     <Route element={<OwnerRoute/>}>
                     <Route path="/analytics" element={<Layout><AnalyticsPage/></Layout>} />
                     <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
+                    </Route>
+                    {/* admin-only pages */}
+                    <Route element={<AdminRoute/>}>
+                    <Route path="/admin" element={<Layout><AdminPage/></Layout>} />
                     </Route>
                 </Route>
             <Route path="*" element={<Layout showHero={false}><NotFoundPage/></Layout>} />

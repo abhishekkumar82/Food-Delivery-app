@@ -10,15 +10,14 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Link } from 'react-router-dom';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
-import { useGetMyRestaurant } from '@/api/MyRestaurantApi';
+import { useRole } from '@/api/MyUserApi';
 
 const itemClass = 'font-bold hover:text-orange-500';
 
 const UsernameMenu = () => {
   const { user, logout } = useAuth0();
-  // owner-only links appear only when this account actually owns a restaurant
-  const { restaurant } = useGetMyRestaurant();
-  const isOwner = !!restaurant;
+  // role drives which sections appear
+  const { isOwner, isAdmin, role } = useRole();
 
   return (
     <DropdownMenu>
@@ -67,18 +66,33 @@ const UsernameMenu = () => {
 
         <Separator />
         <DropdownMenuLabel className="text-xs text-gray-400">Restaurant</DropdownMenuLabel>
-        <DropdownMenuItem>
-          <Link to="/manage-restaurant" className={itemClass}>Manage Restaurant</Link>
-        </DropdownMenuItem>
-        {isOwner && (
+        {role === "customer" && (
           <DropdownMenuItem>
-            <Link to="/analytics" className={itemClass}>Analytics</Link>
+            <Link to="/partner" className={itemClass}>🏪 Become a Partner</Link>
           </DropdownMenuItem>
         )}
         {isOwner && (
-          <DropdownMenuItem>
-            <Link to="/manage-surprise-bags" className={itemClass}>Manage Surprise Bags</Link>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem>
+              <Link to="/manage-restaurant" className={itemClass}>Manage Restaurant</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to="/analytics" className={itemClass}>Analytics</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to="/manage-surprise-bags" className={itemClass}>Manage Surprise Bags</Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {isAdmin && (
+          <>
+            <Separator />
+            <DropdownMenuLabel className="text-xs text-gray-400">Admin</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Link to="/admin" className={itemClass}>🛡️ Admin Dashboard</Link>
+            </DropdownMenuItem>
+          </>
         )}
 
         <Separator />

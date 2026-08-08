@@ -148,6 +148,17 @@ async function seed() {
     );
   }
 
+  // migrate: any account that owns a restaurant becomes an "owner"
+  // (guard against any stale/malformed user references in old data)
+  const ownerIds = (await Restaurant.distinct("user")).filter(
+    (id) => id && mongoose.isValidObjectId(id)
+  );
+  const migrated = await User.updateMany(
+    { _id: { $in: ownerIds }, role: "customer" },
+    { role: "owner" }
+  );
+  console.log(`ensured owner role on ${migrated.modifiedCount} account(s)`);
+
   await mongoose.disconnect();
   console.log("seed complete ✅");
 }

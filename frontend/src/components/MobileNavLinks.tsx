@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useGetMyRestaurant } from "@/api/MyRestaurantApi";
+import { useRole } from "@/api/MyUserApi";
 
 const linkClass =
   "flex bg-white items-center font-bold hover:text-orange-500";
 
 const MobileNavLinks = () => {
   const { logout } = useAuth0();
-  const { restaurant } = useGetMyRestaurant();
-  const isOwner = !!restaurant;
+  const { isOwner, isAdmin, role } = useRole();
 
   return (
     <>
@@ -40,17 +39,27 @@ const MobileNavLinks = () => {
       <Link to="/surprise-bags" className={linkClass}>
         Surprise Bags
       </Link>
-      <Link to="/manage-restaurant" className={linkClass}>
-        Manage Restaurant
-      </Link>
-      {isOwner && (
-        <Link to="/analytics" className={linkClass}>
-          Analytics
+      {role === "customer" && (
+        <Link to="/partner" className={linkClass}>
+          🏪 Become a Partner
         </Link>
       )}
       {isOwner && (
-        <Link to="/manage-surprise-bags" className={linkClass}>
-          Manage Surprise Bags
+        <>
+          <Link to="/manage-restaurant" className={linkClass}>
+            Manage Restaurant
+          </Link>
+          <Link to="/analytics" className={linkClass}>
+            Analytics
+          </Link>
+          <Link to="/manage-surprise-bags" className={linkClass}>
+            Manage Surprise Bags
+          </Link>
+        </>
+      )}
+      {isAdmin && (
+        <Link to="/admin" className={linkClass}>
+          🛡️ Admin Dashboard
         </Link>
       )}
       <Button

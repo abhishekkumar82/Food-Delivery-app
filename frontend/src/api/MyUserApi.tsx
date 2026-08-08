@@ -42,7 +42,19 @@ export const useGetMyUser = () => {
   
     return { currentUser, isLoading };
   };
-  
+
+// Convenience hook: current user's role + derived flags for gating.
+export const useRole = () => {
+  const { currentUser, isLoading } = useGetMyUser();
+  const role = currentUser?.role ?? "customer";
+  return {
+    role,
+    isAdmin: role === "admin",
+    isOwner: role === "owner" || role === "admin",
+    isLoading,
+  };
+};
+
 
 type CreateUserRequest={
 
@@ -96,8 +108,7 @@ export const useUpdateMyUser=()=>{
 
     const updateMyUserRequest=async (formData:updateMyUserRequest)=>{
         const accessToken=await getAccessTokenSilently();
-        console.log(accessToken);
-        
+
          const response =await fetch(`${API_BASE_URL}/api/my/user`,{
             method:"PUT",
             headers:{
