@@ -8,7 +8,7 @@ const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const useGetMyRestaurant = () => {
   const { getAccessTokenSilently } = useAuth0();
 
-  const getMyRestaurantRequest = async (): Promise<Restaurant> => {
+  const getMyRestaurantRequest = async (): Promise<Restaurant | undefined> => {
     const accessToken = await getAccessTokenSilently();
 
     const response = await fetch(`${API_BASE_URL}/api/my/restaurant`, {
@@ -18,6 +18,10 @@ export const useGetMyRestaurant = () => {
       },
     });
 
+    // 404 simply means this account doesn't own a restaurant (not an error)
+    if (response.status === 404) {
+      return undefined;
+    }
     if (!response.ok) {
       throw new Error("Failed to get restaurant");
     }
@@ -26,7 +30,8 @@ export const useGetMyRestaurant = () => {
 
   const { data: restaurant, isLoading } = useQuery(
     "fetchMyRestaurant",
-    getMyRestaurantRequest
+    getMyRestaurantRequest,
+    { retry: false }
   );
 
   return { restaurant, isLoading };

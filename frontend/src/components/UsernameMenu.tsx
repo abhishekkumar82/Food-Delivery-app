@@ -4,9 +4,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Link } from 'react-router-dom';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
+import { useGetMyRestaurant } from '@/api/MyRestaurantApi';
 
 const UsernameMenu = () => {
 const {user,logout}=useAuth0();
+// owner-only links appear only when this account actually owns a restaurant
+const {restaurant}=useGetMyRestaurant();
+const isOwner=!!restaurant;
 
   return (
     <DropdownMenu>
@@ -23,6 +27,7 @@ const {user,logout}=useAuth0();
            Manage Restaurant
         </Link>
         </DropdownMenuItem>
+        {isOwner && (
         <DropdownMenuItem>
         <Link
         to="/analytics"
@@ -31,6 +36,8 @@ const {user,logout}=useAuth0();
            Analytics
         </Link>
         </DropdownMenuItem>
+        )}
+        {isOwner && (
         <DropdownMenuItem>
         <Link
         to="/manage-surprise-bags"
@@ -39,6 +46,7 @@ const {user,logout}=useAuth0();
            Manage Surprise Bags
         </Link>
         </DropdownMenuItem>
+        )}
         <DropdownMenuItem>
         <Link
         to="/user-profile"

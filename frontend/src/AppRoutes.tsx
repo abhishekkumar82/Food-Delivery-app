@@ -4,6 +4,7 @@ import HomePage from "./Pages/HomePage";
 import AuthCallbackPage from "./Pages/AuthCallbackPage";
 import UserProfilePage from "./Pages/UserProfilePage";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import OwnerRoute from "./auth/OwnerRoute";
 import ManageRestaurantPage from "./Pages/ManageRestaurantPage";
 import SearchPage from "./Pages/SearchPage";
 import DetailPage from "./Pages/DetailPage";
@@ -54,16 +55,19 @@ const AppRoutes=()=>{
                <Route path="/address-book" element={<Layout><AddressBookPage/></Layout>} />
                <Route path="/favorites" element={<Layout><FavoritesPage/></Layout>} />
                <Route path="/wallet" element={<Layout><WalletPage/></Layout>} />
-               <Route path="/analytics" element={<Layout><AnalyticsPage/></Layout>} />
                <Route path="/membership" element={<Layout><MembershipPage/></Layout>} />
                <Route path="/rewards" element={<Layout><RewardsPage/></Layout>} />
                <Route path="/recommendations" element={<Layout><RecommendationsPage/></Layout>} />
-               <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
                <Route path="/my-impact" element={<Layout><SustainabilityPage/></Layout>} />
                <Route path="/join-group" element={<Layout><JoinGroupPage/></Layout>} />
                <Route path="/group/:code" element={<Layout><GroupOrderPage/></Layout>} />
                <Route path="/manage-restaurant" element={<Layout><ManageRestaurantPage/></Layout>} />
-                </Route>            
+                    {/* owner-only pages: require the user to own a restaurant */}
+                    <Route element={<OwnerRoute/>}>
+                    <Route path="/analytics" element={<Layout><AnalyticsPage/></Layout>} />
+                    <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
+                    </Route>
+                </Route>
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     )

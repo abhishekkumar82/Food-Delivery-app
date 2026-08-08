@@ -5,9 +5,16 @@ import Restaurant from "../models/restaurant";
 import { emitDriverLocation } from "../lib/orderEffects";
 import { notify } from "../lib/notify";
 
-// POST /api/driver  (auth) -> register a rider
+// POST /api/driver  (auth, restaurant owner) -> register a rider
 const createDriver = async (req: Request, res: Response) => {
   try {
+    // only restaurant owners manage delivery riders, so gate registration to them
+    const restaurant = await Restaurant.findOne({ user: req.userId });
+    if (!restaurant) {
+      return res
+        .status(403)
+        .json({ message: "Only restaurant owners can register riders" });
+    }
     const driver = new Driver({ ...req.body, user: req.userId });
     await driver.save();
     res.status(201).json(driver);
@@ -33,14 +40,19 @@ const updateLocation = async (req: Request, res: Response) => {
   try {
     const { driverId } = req.params;
     const { lat, lng } = req.body;
-    const driver = await Driver.findByIdAndUpdate(
-      driverId,
-      { currentLocation: { lat, lng } },
-      { new: true }
-    );
+
+    const driver = await Driver.findById(driverId);
     if (!driver) {
       return res.status(404).json({ message: "driver not found" });
     }
+    // a rider's position may only be updated by the account that owns it
+    if (driver.user?.toString() !== req.userId) {
+      return res
+        .status(403)
+        .json({ message: "You can only update your own rider location" });
+    }
+    driver.currentLocation = { lat, lng } as any;
+    await driver.save();
 
     // broadcast this rider's position to everyone tracking their active orders
     const activeOrders = await Order.find({

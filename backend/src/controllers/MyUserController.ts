@@ -16,12 +16,17 @@ const getCurrentUser=async(req:Request,res:Response)=>{
 }
 const createCurrentUser=async (req:Request,res:Response)=>{
     try {
-        const {auth0Id}=req.body;
+        // Trust the auth0Id from the verified access token (jwtCheck), never the
+        // request body — otherwise a caller could spoof another user's id.
+        const auth0Id = (req as any).auth?.payload?.sub as string | undefined;
+        if(!auth0Id){
+            return res.sendStatus(401);
+        }
         const existingUser=await User.findOne({auth0Id});
         if(existingUser){
             return res.status(200).send();
         }
-        const newUser=new User(req.body);
+        const newUser=new User({ auth0Id, email: req.body.email });
         await newUser.save();
         res.status(201).json(newUser.toObject());
     } catch (error) {

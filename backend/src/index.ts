@@ -112,7 +112,9 @@ cloudinary.config({
 
 const app = express();
 
-app.use(cors());
+// only allow the configured frontend origin (falls back to the Vite dev server)
+const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+app.use(cors({ origin: allowedOrigin, credentials: true }));
 
 // Apply raw body parser specifically for Stripe webhook endpoint
 app.use('/api/order/checkout/webhook', bodyParser.raw({ type: 'application/json' }));
@@ -150,7 +152,7 @@ app.get("/test", async (req: Request, res: Response) => {
 // ---- Tier 2: Socket.io real-time layer (live order tracking + notifications) ----
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: "*" },
+    cors: { origin: allowedOrigin },
 });
 setIO(io);
 

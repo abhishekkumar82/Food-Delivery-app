@@ -94,6 +94,12 @@ const getActiveCoupons = async (_req: Request, res: Response) => {
 // Dev helper: seed a few demo coupons (idempotent by code).
 const seedCoupons = async (_req: Request, res: Response) => {
   try {
+    // never allow seeding on a production deployment
+    if (process.env.NODE_ENV === "production") {
+      return res
+        .status(403)
+        .json({ message: "Seeding is disabled in production" });
+    }
     const samples = [
       {
         code: "WELCOME50",
