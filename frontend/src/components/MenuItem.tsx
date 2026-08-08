@@ -61,7 +61,7 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
         )}
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
-        <span className="font-bold">${(menuItem.price / 100).toFixed(2)}</span>
+        <span className="font-bold">£{(menuItem.price / 100).toFixed(2)}</span>
         {menuItem.description && (
           <span className="text-sm font-normal text-gray-500">
             {menuItem.description}

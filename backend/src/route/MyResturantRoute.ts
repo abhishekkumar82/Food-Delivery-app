@@ -12,7 +12,6 @@ const upload=multer({
         fileSize:5*1024*1024,
     },
 });
-console.log("hiii i ");
 
 // GET /a[pi/my/returant]
 

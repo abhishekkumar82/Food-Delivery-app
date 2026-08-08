@@ -106,7 +106,7 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
         {applied ? (
           <div className="flex items-center justify-between rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
             <span>
-              {applied.code} — {(applied.discountAmount / 100).toFixed(2)} off
+              {applied.code} — £{(applied.discountAmount / 100).toFixed(2)} off
             </span>
             <X
               size={16}

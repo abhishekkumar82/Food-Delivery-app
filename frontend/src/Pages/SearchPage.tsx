@@ -70,7 +70,7 @@ const SearchPage = () => {
     }))
   }
     if(isLoading){
-    <span>Loading....</span>
+      return <span>Loading...</span>;
     }
       if(!results?.data || !city){
         return <span>No Results found</span>
@@ -89,7 +89,7 @@ const SearchPage = () => {
       </div>
      
       {results.data.map((restaurant)=>(
-     <SearchResultCard  restaurant={restaurant}  />
+     <SearchResultCard key={restaurant._id} restaurant={restaurant}  />
       ))}
       <PaginationSelector 
       page={results.pagination.page} 

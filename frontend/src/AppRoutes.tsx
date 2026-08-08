@@ -1,5 +1,6 @@
-import { Navigate, Route ,Routes } from "react-router-dom"
+import { Route ,Routes } from "react-router-dom"
 import Layout from "../src/layouts/layout";
+import NotFoundPage from "./Pages/NotFoundPage";
 import HomePage from "./Pages/HomePage";
 import AuthCallbackPage from "./Pages/AuthCallbackPage";
 import UserProfilePage from "./Pages/UserProfilePage";
@@ -68,7 +69,7 @@ const AppRoutes=()=>{
                     <Route path="/manage-surprise-bags" element={<Layout><ManageSurpriseBagsPage/></Layout>} />
                     </Route>
                 </Route>
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Layout showHero={false}><NotFoundPage/></Layout>} />
         </Routes>
     )
 }

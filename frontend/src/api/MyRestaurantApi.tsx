@@ -40,8 +40,7 @@ export const useGetMyRestaurant = () => {
 
 export const useCreateMyRestaurant = () => {
     const { getAccessTokenSilently } = useAuth0();
-    console.log("aur kya haal chal");
-    
+
     const createMyRestaurantRequest = async (
       restaurantFormData: FormData
     ): Promise<Restaurant> => {

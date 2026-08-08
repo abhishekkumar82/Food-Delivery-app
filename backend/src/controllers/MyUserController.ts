@@ -52,10 +52,7 @@ const updateCurrentUser=async (req:Request,res:Response)=>{
         user.country=country;
 
         await user.save();
- console.log(user);
- console.log("hii ia ");
- 
- res.send(user);
+        res.send(user);
        
 
     } catch (error) {

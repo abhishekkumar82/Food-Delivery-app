@@ -26,7 +26,7 @@ const CheckoutButton = ({onCheckout,disabled,isLoading}:Props) => {
         return (
             
            <Button onClick={onLogin}  className="bg-orange-500 flex-1" >
-            login in to check out
+            Log in to check out
            </Button>
            
         );  
