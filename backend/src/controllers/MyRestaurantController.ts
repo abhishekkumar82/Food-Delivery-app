@@ -23,13 +23,26 @@ const getMyRestaurant=async(req:Request,res:Response)=>{
 const createMyRestaurant = async (req: Request, res: Response) => {
     try {
       const existingRestaurant = await Restaurant.findOne({ user: req.userId });
-  
+
       if (existingRestaurant) {
         return res
           .status(409)
           .json({ message: "User restaurant already exists" });
       }
-  
+
+      // require the registration fee to be paid first (admins are exempt)
+      const feeRequired = Number(process.env.PARTNER_REGISTRATION_FEE) || 0;
+      if (feeRequired > 0) {
+        const account = await User.findById(req.userId).select(
+          "role partnerFeePaid"
+        );
+        if (account?.role !== "admin" && !account?.partnerFeePaid) {
+          return res.status(402).json({
+            message: "Please pay the partner registration fee first",
+          });
+        }
+      }
+
       const imageUrl = await uploadImage(req.file as Express.Multer.File);
   
       const restaurant = new Restaurant(req.body);

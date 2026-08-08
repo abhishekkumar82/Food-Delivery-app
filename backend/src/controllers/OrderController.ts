@@ -185,15 +185,26 @@ const stripeWebhookHandler = async (req: Request, res: Response) => {
   }
 
   if (event.type === "checkout.session.completed") {
-    const order = await Order.findById(event.data.object.metadata?.orderId);
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
+    const session = event.data.object;
 
-    order.totalAmount = event.data.object.amount_total as number;
-    // consume wallet + coupon now that payment succeeded
-    await finalizeOrderCharges(order);
-    await applyStatusChange(order, "paid");
+    // ---- partner registration fee ----
+    if (session.metadata?.type === "partner_fee") {
+      if (session.metadata.userId) {
+        await User.findByIdAndUpdate(session.metadata.userId, {
+          partnerFeePaid: true,
+        });
+      }
+    } else {
+      // ---- normal food order ----
+      const order = await Order.findById(session.metadata?.orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      order.totalAmount = session.amount_total as number;
+      // consume wallet + coupon now that payment succeeded
+      await finalizeOrderCharges(order);
+      await applyStatusChange(order, "paid");
+    }
   }
 
   res.status(200).send();

@@ -40,6 +40,8 @@ const userSchema = new mongoose.Schema({
     enum: ["customer", "owner", "admin"],
     default: "customer",
   },
+  // ---- Partner registration fee (paid before becoming an owner) ----
+  partnerFeePaid: { type: Boolean, default: false },
   name: {
     type: String,
   },

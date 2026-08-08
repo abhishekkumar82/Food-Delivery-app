@@ -1,6 +1,9 @@
+import { useGetPartnerStatus, usePayPartnerFee } from "@/api/PartnerApi";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Bike, Store, UtensilsCrossed } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const perks = [
   { icon: UtensilsCrossed, text: "Publish your menu with photos, veg/non-veg & bestseller tags" },
@@ -9,6 +12,30 @@ const perks = [
 ];
 
 const PartnerPage = () => {
+  const { status, isLoading } = useGetPartnerStatus();
+  const { payFee, isLoading: isPaying } = usePayPartnerFee();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  useEffect(() => {
+    if (params.get("cancelled")) {
+      toast.error("Payment cancelled — you can try again anytime.");
+    }
+  }, [params]);
+
+  const handlePay = async () => {
+    const data = await payFee();
+    if (data.url) {
+      window.location.href = data.url; // off to Stripe checkout
+    } else if (data.alreadyPaid) {
+      navigate("/manage-restaurant");
+    }
+  };
+
+  const fee = status?.fee ?? 0;
+  const symbol = status?.currency === "inr" ? "₹" : "";
+  const alreadyPaid = status?.paid;
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 py-14 text-center">
       <Store size={48} className="text-orange-500" />
@@ -27,12 +54,43 @@ const PartnerPage = () => {
         ))}
       </div>
 
-      <Link to="/manage-restaurant">
-        <Button className="mt-2 bg-orange-500">List your restaurant</Button>
-      </Link>
-      <p className="text-xs text-gray-400">
-        You'll become a restaurant partner as soon as you create your restaurant.
-      </p>
+      {isLoading ? (
+        <span>Loading...</span>
+      ) : alreadyPaid ? (
+        <>
+          <p className="text-sm font-semibold text-green-600">
+            ✓ Registration fee paid — you're all set!
+          </p>
+          <Button
+            className="bg-orange-500"
+            onClick={() => navigate("/manage-restaurant")}
+          >
+            List your restaurant
+          </Button>
+        </>
+      ) : (
+        <>
+          {fee > 0 && (
+            <div className="rounded-lg bg-orange-50 px-6 py-3">
+              <span className="text-sm text-gray-600">One-time registration fee</span>
+              <p className="text-2xl font-bold text-orange-600">
+                {symbol}
+                {fee}
+              </p>
+            </div>
+          )}
+          <Button className="bg-orange-500" disabled={isPaying} onClick={handlePay}>
+            {isPaying
+              ? "Redirecting..."
+              : fee > 0
+              ? `Pay ${symbol}${fee} & Register`
+              : "Register your restaurant"}
+          </Button>
+          <p className="text-xs text-gray-400">
+            You'll become a restaurant partner as soon as the payment succeeds.
+          </p>
+        </>
+      )}
     </div>
   );
 };
