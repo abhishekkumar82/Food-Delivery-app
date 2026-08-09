@@ -15,8 +15,6 @@ const LocationSelector = () => {
   const { cities } = useGetCities();
   const [detecting, setDetecting] = useState(false);
 
-  const options = cities && cities.length ? cities : [city];
-
   // FREE: browser geolocation + OpenStreetMap Nominatim reverse geocoding.
   const detect = () => {
     if (!navigator.geolocation) {
@@ -64,7 +62,7 @@ const LocationSelector = () => {
             toast.error(`No restaurants near ${detected} yet — showing ${city}.`);
           }
         } catch {
-          toast.error("Couldn't detect your city — please pick it manually.");
+          toast.error("Couldn't detect your city, please try again.");
         } finally {
           setDetecting(false);
         }
@@ -78,31 +76,22 @@ const LocationSelector = () => {
   };
 
   return (
-    <div className="flex items-center gap-1" title="Delivery city">
+    <div className="flex items-center gap-1.5">
       <MapPin size={18} className="text-orange-500" />
-      <select
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        className="cursor-pointer bg-transparent font-bold text-orange-600 outline-none"
-      >
-        {options.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
+      <span className="font-bold text-orange-600">{city}</span>
       <button
         type="button"
         onClick={detect}
         disabled={detecting}
         title="Use my current location"
-        className="ml-1 text-orange-500 hover:text-orange-600"
+        className="ml-1 flex items-center gap-1 rounded-full border border-orange-500 px-2 py-0.5 text-xs font-semibold text-orange-500 hover:bg-orange-50 disabled:opacity-60"
       >
         {detecting ? (
-          <Loader2 size={16} className="animate-spin" />
+          <Loader2 size={14} className="animate-spin" />
         ) : (
-          <Navigation size={16} />
+          <Navigation size={14} />
         )}
+        {detecting ? "Locating…" : "Use my location"}
       </button>
     </div>
   );
