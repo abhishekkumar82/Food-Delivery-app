@@ -85,7 +85,20 @@ const searchRestaurant=async(req:Request,res:Response)=>{
 }
 
 
+// GET /api/restaurant/cities -> distinct cities that have restaurants (for the
+// homepage "Deliver to" selector)
+const getCities = async (_req: Request, res: Response) => {
+  try {
+    const cities = await Restaurant.distinct("city");
+    res.json(cities.filter(Boolean).sort());
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 export default{
     searchRestaurant,
     getRestaurant,
+    getCities,
 }

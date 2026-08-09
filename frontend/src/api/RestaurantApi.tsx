@@ -39,7 +39,7 @@ export const useSearchRestaurants=(searchState:SearchState ,city?:string)=>{
         return response.json();
     };
     const {data:results,isLoading}=useQuery(
-        ["searchRestaurants",searchState],
+        ["searchRestaurants",city,searchState],
         createSearchRequest,
         {enabled:!!city},
     );
@@ -48,4 +48,15 @@ export const useSearchRestaurants=(searchState:SearchState ,city?:string)=>{
         isLoading,
         results,
     }
+};
+
+// Distinct cities that currently have restaurants (for the homepage selector).
+export const useGetCities = () => {
+    const request = async (): Promise<string[]> => {
+        const response = await fetch(`${API_BASE_URL}/api/restaurant/cities`);
+        if (!response.ok) throw new Error("Failed to get cities");
+        return response.json();
+    };
+    const { data: cities } = useQuery("fetchCities", request);
+    return { cities };
 };
