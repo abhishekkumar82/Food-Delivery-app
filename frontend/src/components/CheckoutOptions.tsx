@@ -1,4 +1,4 @@
-import { useValidateCoupon } from "@/api/CouponApi";
+import { useGetActiveCoupons, useValidateCoupon } from "@/api/CouponApi";
 import { useGetWallet } from "@/api/WalletApi";
 import { AppliedCoupon } from "@/types";
 import { useEffect, useState } from "react";
@@ -25,6 +25,7 @@ type Props = {
 const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
   const { wallet } = useGetWallet();
   const { validateCoupon, isLoading: isValidating } = useValidateCoupon();
+  const { coupons } = useGetActiveCoupons();
 
   const [codeInput, setCodeInput] = useState("");
   const [applied, setApplied] = useState<AppliedCoupon | null>(null);
@@ -60,6 +61,16 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
     scheduledFor,
     ecoPackaging,
   ]);
+
+  const applyCode = async (code: string) => {
+    try {
+      const result = await validateCoupon({ code, subtotal, restaurantId });
+      setApplied(result);
+      toast.success(`Coupon ${result.code} applied`);
+    } catch (e: any) {
+      toast.error(e.message || "Invalid coupon");
+    }
+  };
 
   const handleApply = async () => {
     if (!codeInput.trim()) return;
@@ -133,6 +144,37 @@ const CheckoutOptions = ({ subtotal, restaurantId, onChange }: Props) => {
             >
               Apply
             </Button>
+          </div>
+        )}
+
+        {!applied && coupons && coupons.length > 0 && (
+          <div className="mt-2 flex flex-col gap-1">
+            {coupons.map((c) => {
+              const ok = subtotal >= (c.minOrderAmount || 0);
+              return (
+                <button
+                  key={c.code}
+                  type="button"
+                  disabled={!ok}
+                  onClick={() => applyCode(c.code)}
+                  className={`flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-left text-xs ${
+                    ok
+                      ? "border-orange-300 bg-white text-gray-800 hover:bg-orange-50"
+                      : "border-gray-100 bg-gray-50 text-gray-400"
+                  }`}
+                >
+                  <span>
+                    <b>{c.code}</b>
+                    {c.description ? ` — ${c.description}` : ""}
+                  </span>
+                  <span className="shrink-0 font-semibold">
+                    {ok
+                      ? "Apply"
+                      : `Add £${(((c.minOrderAmount || 0) - subtotal) / 100).toFixed(2)}`}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

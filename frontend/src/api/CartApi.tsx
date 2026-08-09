@@ -5,12 +5,15 @@ import { toast } from "sonner";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const useGetMyCart = () => {
+export const useGetMyCart = (restaurantId?: string) => {
   const { getAccessTokenSilently } = useAuth0();
 
   const getCartRequest = async (): Promise<Cart> => {
     const accessToken = await getAccessTokenSilently();
-    const response = await fetch(`${API_BASE_URL}/api/my/cart`, {
+    const query = restaurantId
+      ? `?restaurantId=${encodeURIComponent(restaurantId)}`
+      : "";
+    const response = await fetch(`${API_BASE_URL}/api/my/cart${query}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!response.ok) {
@@ -19,7 +22,11 @@ export const useGetMyCart = () => {
     return response.json();
   };
 
-  const { data: cart, isLoading } = useQuery("fetchMyCart", getCartRequest);
+  // cache per restaurant so switching restaurants doesn't reuse the wrong basket
+  const { data: cart, isLoading } = useQuery(
+    ["fetchMyCart", restaurantId],
+    getCartRequest
+  );
   return { cart, isLoading };
 };
 

@@ -11,6 +11,8 @@ import CheckoutButton from "@/components/CheckoutButton";
 import CheckoutOptions, { CheckoutSelections } from "@/components/CheckoutOptions";
 import MenuItem from "@/components/MenuItem";
 import OrderSummary from "@/components/OrderSummary";
+import OffersProgress from "@/components/OffersProgress";
+import { autoOffers } from "@/config/offers";
 import RestaurantInfo from "@/components/RestaurantInfo";
 import ReviewSection from "@/components/ReviewSection";
 import AiReviewSummary from "@/components/AiReviewSummary";
@@ -51,7 +53,7 @@ const DetailPage = () => {
     walletApplied:0,
   });
   // persistent server-side cart (Tier 1) — only used when logged in
-  const {cart:serverCart}=useGetMyCart();
+  const {cart:serverCart}=useGetMyCart(restaurantId);
   const {updateCart}=useUpdateMyCart();
    const [cartItems,setCartItems]=useState<CartItem[]>(()=>{
       const storedCartItems=sessionStorage.getItem(`cartItems-${restaurantId}`);
@@ -182,11 +184,13 @@ const addToCart = (menuItem: menuItem) => {
         await createCodOrder(checkoutData);
         sessionStorage.removeItem(`cartItems-${restaurantId}`);
         setCartItems([]);
+        syncCart([]); // clear this restaurant's saved basket after ordering
         navigate("/order-status");
       }
     }
 
     const subtotal=cartItems.reduce((t,ci)=>t+ci.price*ci.quantity,0);
+    const offers=autoOffers(subtotal);
 
 
   if(isLoading || !restaurant){
@@ -210,7 +214,10 @@ return (
             </div>
 <div>
     <Card>
-        <OrderSummary restaurant={restaurant} cartItems={cartItems} removeFromCart={removeFromCart} discountAmount={selections.discountAmount} walletApplied={selections.walletApplied} />
+        <OrderSummary restaurant={restaurant} cartItems={cartItems} removeFromCart={removeFromCart} discountAmount={selections.discountAmount} walletApplied={selections.walletApplied} freeDelivery={offers.freeDelivery} autoDiscount={offers.autoDiscount} />
+        {cartItems.length>0 && (
+          <div className="px-6 pb-2"><OffersProgress subtotal={subtotal} /></div>
+        )}
         {cartItems.length>0 && (
           <CheckoutOptions subtotal={subtotal} restaurantId={restaurant._id} onChange={setSelections} />
         )}

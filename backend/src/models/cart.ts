@@ -16,18 +16,29 @@ const cartItemSchema = new mongoose.Schema({
   ],
 });
 
+// One basket per restaurant, so a user can build carts at several
+// restaurants at once (each checks out into its own order).
+const restaurantCartSchema = new mongoose.Schema(
+  {
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
+      required: true,
+    },
+    items: { type: [cartItemSchema], default: [] },
+    updatedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const cartSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-    unique: true, // one active cart per user
+    unique: true, // one cart document per user, holding many restaurant baskets
   },
-  restaurant: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Restaurant",
-  },
-  items: { type: [cartItemSchema], default: [] },
+  carts: { type: [restaurantCartSchema], default: [] },
   updatedAt: { type: Date, default: Date.now },
 });
 

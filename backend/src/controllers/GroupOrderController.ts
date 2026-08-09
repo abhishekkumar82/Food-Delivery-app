@@ -152,13 +152,19 @@ const checkoutGroup = async (req: Request, res: Response) => {
       quantity: i.quantity,
     }));
 
+    // upsert just this restaurant's basket, leaving other restaurants' carts intact
+    await Cart.findOneAndUpdate(
+      { user: req.userId },
+      { $pull: { carts: { restaurant: group.restaurant } } },
+      { upsert: true }
+    );
     await Cart.findOneAndUpdate(
       { user: req.userId },
       {
-        user: req.userId,
-        restaurant: group.restaurant,
-        items,
-        updatedAt: new Date(),
+        $push: {
+          carts: { restaurant: group.restaurant, items, updatedAt: new Date() },
+        },
+        $set: { updatedAt: new Date() },
       },
       { upsert: true, new: true }
     );

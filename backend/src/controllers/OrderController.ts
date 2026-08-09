@@ -9,6 +9,7 @@ import { computeDiscount } from "./CouponController";
 import { getMembershipPerks } from "./MembershipController";
 import { applyStatusChange } from "../lib/orderEffects";
 import { notify } from "../lib/notify";
+import { computeAutoOffers } from "../config/offers";
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
 const FRONTEND_URL = process.env.FRONTEND_URL as string;
@@ -264,7 +265,10 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     // ---- Tier 3: membership perks (free delivery + extra % off) ----
     const perks = await getMembershipPerks(req.userId);
     const memberDiscount = Math.round((subtotal * perks.discountPercent) / 100);
-    const effectiveDelivery = perks.freeDelivery ? 0 : restaurant.deliveryPrice;
+    // ---- automatic order offers (free delivery / flat off by subtotal) ----
+    const auto = computeAutoOffers(subtotal);
+    const freeDelivery = perks.freeDelivery || auto.freeDelivery;
+    const effectiveDelivery = freeDelivery ? 0 : restaurant.deliveryPrice;
 
     const newOrder = new Order({
       restaurant: restaurant,
@@ -278,7 +282,8 @@ const createCheckoutSession = async (req: Request, res: Response) => {
         : { discountAmount: 0 },
       walletApplied,
       memberDiscount,
-      freeDelivery: perks.freeDelivery,
+      autoDiscount: auto.flatDiscount,
+      freeDelivery,
       ecoPackaging: !!checkoutSessionRequest.ecoPackaging,
       carbonGrams: estimateCarbon(
         checkoutSessionRequest.cartItems,
@@ -297,7 +302,7 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     );
 
     // Apply coupon + wallet + membership discount as a single one-off Stripe discount.
-    const totalOff = discountAmount + walletApplied + memberDiscount;
+    const totalOff = discountAmount + walletApplied + memberDiscount + auto.flatDiscount;
     let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
     if (totalOff > 0) {
       const stripeCoupon = await STRIPE.coupons.create({
@@ -357,11 +362,19 @@ const createCodOrder = async (req: Request, res: Response) => {
     // ---- Tier 3: membership perks ----
     const perks = await getMembershipPerks(req.userId);
     const memberDiscount = Math.round((subtotal * perks.discountPercent) / 100);
-    const effectiveDelivery = perks.freeDelivery ? 0 : restaurant.deliveryPrice;
+    // ---- automatic order offers ----
+    const auto = computeAutoOffers(subtotal);
+    const freeDelivery = perks.freeDelivery || auto.freeDelivery;
+    const effectiveDelivery = freeDelivery ? 0 : restaurant.deliveryPrice;
 
     const totalAmount = Math.max(
       0,
-      subtotal + effectiveDelivery - discountAmount - walletApplied - memberDiscount
+      subtotal +
+        effectiveDelivery -
+        discountAmount -
+        walletApplied -
+        memberDiscount -
+        auto.flatDiscount
     );
 
     const newOrder = new Order({
@@ -386,11 +399,13 @@ const createCodOrder = async (req: Request, res: Response) => {
     await newOrder.save();
     await finalizeOrderCharges(newOrder);
 
-    // clear the user's server-side cart
+    // clear only the ordered restaurant's basket (other restaurants' carts stay)
     await Cart.findOneAndUpdate(
       { user: req.userId },
-      { items: [], restaurant: null, updatedAt: new Date() },
-      { upsert: true }
+      {
+        $pull: { carts: { restaurant: restaurant._id } },
+        $set: { updatedAt: new Date() },
+      }
     );
 
     await notify({
@@ -443,13 +458,19 @@ const reorder = async (req: Request, res: Response) => {
       })
       .filter(Boolean);
 
+    // upsert just this restaurant's basket, leaving other restaurants' carts intact
+    await Cart.findOneAndUpdate(
+      { user: req.userId },
+      { $pull: { carts: { restaurant: restaurant._id } } },
+      { upsert: true }
+    );
     const cart = await Cart.findOneAndUpdate(
       { user: req.userId },
       {
-        user: req.userId,
-        restaurant: restaurant._id,
-        items,
-        updatedAt: new Date(),
+        $push: {
+          carts: { restaurant: restaurant._id, items, updatedAt: new Date() },
+        },
+        $set: { updatedAt: new Date() },
       },
       { new: true, upsert: true }
     );

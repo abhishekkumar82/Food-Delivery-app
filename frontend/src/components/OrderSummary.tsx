@@ -11,6 +11,8 @@ type Props = {
   removeFromCart: (cartItem: CartItem) => void;
   discountAmount?: number;
   walletApplied?: number;
+  freeDelivery?: boolean;
+  autoDiscount?: number;
 };
 
 const OrderSummary = ({
@@ -19,14 +21,17 @@ const OrderSummary = ({
   removeFromCart,
   discountAmount = 0,
   walletApplied = 0,
+  freeDelivery = false,
+  autoDiscount = 0,
 }: Props) => {
+  const delivery = freeDelivery ? 0 : restaurant.deliveryPrice;
   const getTotalCost = () => {
     const totalInPence = cartItems.reduce(
       (total, cartItem) => total + cartItem.price * cartItem.quantity,
       0
     );
     const totalWithDelivery =
-      totalInPence + restaurant.deliveryPrice - discountAmount - walletApplied;
+      totalInPence + delivery - discountAmount - walletApplied - autoDiscount;
 
     return (Math.max(0, totalWithDelivery) / 100).toFixed(2);
   };
@@ -61,8 +66,18 @@ const OrderSummary = ({
         <Separator />
         <div className="flex justify-between">
           <span>Delivery</span>
-          <span> £{(restaurant.deliveryPrice / 100).toFixed(2)} </span>
+          {freeDelivery ? (
+            <span className="font-semibold text-green-600">FREE</span>
+          ) : (
+            <span> £{(restaurant.deliveryPrice / 100).toFixed(2)} </span>
+          )}
         </div>
+        {autoDiscount > 0 && (
+          <div className="flex justify-between text-green-600">
+            <span>Offer discount</span>
+            <span>-£{(autoDiscount / 100).toFixed(2)}</span>
+          </div>
+        )}
         {discountAmount > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Coupon discount</span>

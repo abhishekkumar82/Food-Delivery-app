@@ -60,6 +60,7 @@ const orderSchema = new mongoose.Schema({
   walletApplied: { type: Number, default: 0 }, // minor units redeemed from wallet
   // ---- Tier 3: membership perks applied to this order ----
   memberDiscount: { type: Number, default: 0 }, // minor units off from membership
+  autoDiscount: { type: Number, default: 0 }, // minor units off from automatic order offers
   freeDelivery: { type: Boolean, default: false },
   // ---- Tier 3: sustainability ----
   ecoPackaging: { type: Boolean, default: false }, // opted for eco-friendly packaging

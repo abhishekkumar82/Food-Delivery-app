@@ -30,6 +30,22 @@ const AdminPage = () => {
   const { createCoupon, isLoading: isCreatingCoupon } = useCreateCoupon();
   const { deleteCoupon } = useDeleteCoupon();
 
+  const PAGE = 8;
+  const [uPage, setUPage] = useState(1);
+  const [rPage, setRPage] = useState(1);
+  const [oPage, setOPage] = useState(1);
+  const pager = (page: number, setPage: (n: number) => void, total: number) => {
+    const pages = Math.max(1, Math.ceil(total / PAGE));
+    if (pages <= 1) return null;
+    return (
+      <div className="mt-2 flex items-center justify-end gap-2 text-sm">
+        <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded border px-2 py-0.5 disabled:opacity-40">Prev</button>
+        <span>{page}/{pages}</span>
+        <button disabled={page >= pages} onClick={() => setPage(page + 1)} className="rounded border px-2 py-0.5 disabled:opacity-40">Next</button>
+      </div>
+    );
+  };
+
   const [couponForm, setCouponForm] = useState<Partial<AdminCoupon>>({
     code: "",
     description: "",
@@ -78,7 +94,7 @@ const AdminPage = () => {
               </tr>
             </thead>
             <tbody>
-              {users?.map((u) => (
+              {users?.slice((uPage - 1) * PAGE, uPage * PAGE).map((u) => (
                 <tr key={u._id} className="border-t">
                   <td className="p-3">{u.email}</td>
                   <td className="p-3">{u.name || "—"}</td>
@@ -100,13 +116,14 @@ const AdminPage = () => {
             </tbody>
           </table>
         </div>
+        {pager(uPage, setUPage, users?.length || 0)}
       </section>
 
       {/* restaurants */}
       <section>
         <h2 className="mb-3 text-lg font-bold">Restaurants</h2>
         <div className="grid gap-3 md:grid-cols-2">
-          {restaurants?.map((r) => (
+          {restaurants?.slice((rPage - 1) * PAGE, rPage * PAGE).map((r) => (
             <div
               key={r._id}
               className="flex items-center justify-between rounded-lg border p-3 text-sm"
@@ -130,6 +147,7 @@ const AdminPage = () => {
             </div>
           ))}
         </div>
+        {pager(rPage, setRPage, restaurants?.length || 0)}
       </section>
 
       {/* coupons */}
@@ -211,7 +229,7 @@ const AdminPage = () => {
       <section>
         <h2 className="mb-3 text-lg font-bold">Recent orders</h2>
         <div className="flex flex-col gap-2">
-          {orders?.slice(0, 20).map((o) => (
+          {orders?.slice((oPage - 1) * PAGE, oPage * PAGE).map((o) => (
             <div
               key={o._id}
               className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
@@ -226,6 +244,7 @@ const AdminPage = () => {
             </div>
           ))}
         </div>
+        {pager(oPage, setOPage, orders?.length || 0)}
       </section>
     </div>
   );
