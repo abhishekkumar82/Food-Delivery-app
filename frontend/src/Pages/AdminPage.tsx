@@ -217,9 +217,9 @@ const AdminPage = () => {
               className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
             >
               <span>
-                {typeof o.restaurant === "object"
+                {o.restaurant && typeof o.restaurant === "object"
                   ? (o.restaurant as any).restaurantName
-                  : "Restaurant"}{" "}
+                  : "(deleted restaurant)"}{" "}
                 <span className="text-gray-400">· {o.status}</span>
               </span>
               <span className="font-semibold">{money(o.totalAmount || 0)}</span>
