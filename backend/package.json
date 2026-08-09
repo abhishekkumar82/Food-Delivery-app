@@ -9,9 +9,10 @@
     "build": "npm install && npx tsc",
     "start": "node dist/index.js",
     "test": "jest",
-    "seed": "ts-node src/scripts/seed.ts",
-    "seed:bulk": "ts-node src/scripts/generateRestaurants.ts",
-    "make-admin": "ts-node src/scripts/makeAdmin.ts"
+    "seed": "ts-node --transpile-only src/scripts/seed.ts",
+    "seed:bulk": "ts-node --transpile-only src/scripts/generateRestaurants.ts",
+    "clean:noimg": "ts-node --transpile-only src/scripts/cleanupNoImageRestaurants.ts",
+    "make-admin": "ts-node --transpile-only src/scripts/makeAdmin.ts"
   },
   "keywords": [],
   "author": "",

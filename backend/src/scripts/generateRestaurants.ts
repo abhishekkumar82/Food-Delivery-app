@@ -11,18 +11,16 @@ import mongoose from "mongoose";
 import User from "../models/user";
 import Restaurant from "../models/restaurant";
 
-const TOTAL = 200;
-const OWNERS = 30;
+const TOTAL = 300;
+const OWNERS = 40;
 
 const img = (id: string) => `https://images.unsplash.com/${id}?w=800&q=80`;
 
 const CITIES = [
-  "London",
-  "Manchester",
-  "Birmingham",
-  "Leeds",
-  "Bristol",
-  "Liverpool",
+  // UK
+  "London", "Manchester", "Birmingham", "Leeds", "Bristol", "Liverpool",
+  // India
+  "Noida", "Delhi", "Gurgaon", "Mumbai", "Bengaluru", "Pune",
 ];
 
 // cuisine -> banner image + dish pool ([name, basePrice in pence])
@@ -76,6 +74,38 @@ const CUISINES: Record<
       ["Chicken Tacos (3pc)", 849], ["Beef Burrito", 999], ["Loaded Nachos", 699],
       ["Quesadilla", 799], ["Guacamole & Chips", 549], ["Chilli Con Carne", 949],
       ["Churros", 449], ["Veggie Fajitas", 899],
+    ],
+  },
+  "North Indian": {
+    banner: "photo-1585937421612-70a008356fbe",
+    dishes: [
+      ["Paneer Butter Masala", 289], ["Dal Makhani", 249], ["Shahi Paneer", 279],
+      ["Butter Naan", 69], ["Chole Bhature", 199], ["Rajma Chawal", 189],
+      ["Tandoori Roti", 39], ["Kadai Chicken", 329],
+    ],
+  },
+  "South Indian": {
+    banner: "photo-1668236543090-82eba5ee5976",
+    dishes: [
+      ["Masala Dosa", 149], ["Idli Sambar (4pc)", 129], ["Medu Vada (2pc)", 119],
+      ["Uttapam", 159], ["Filter Coffee", 69], ["Rava Kesari", 99],
+      ["Lemon Rice", 139], ["Curd Rice", 129],
+    ],
+  },
+  Biryani: {
+    banner: "photo-1631515243349-e0cb75fb8d3a",
+    dishes: [
+      ["Chicken Biryani", 299], ["Mutton Biryani", 399], ["Veg Biryani", 219],
+      ["Egg Biryani", 249], ["Hyderabadi Dum Biryani", 349], ["Chicken 65", 229],
+      ["Raita", 49], ["Gulab Jamun (2pc)", 99],
+    ],
+  },
+  "Street Food": {
+    banner: "photo-1601050690597-df0568f70950",
+    dishes: [
+      ["Pani Puri (6pc)", 79], ["Vada Pav (2pc)", 99], ["Pav Bhaji", 169],
+      ["Aloo Tikki Chaat", 119], ["Samosa Chaat", 129], ["Bhel Puri", 99],
+      ["Dahi Puri", 119], ["Kachori (2pc)", 109],
     ],
   },
 };
