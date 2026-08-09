@@ -2,38 +2,31 @@ import landingImage from "../assets/landing.png";
 import appDownloadImage from "../assets/appDownload.png";
 import SearchBar, { SearchForm } from "@/components/SearchBar";
 import SearchResultCard from "@/components/SearchResultCard";
-import { useGetCities, useSearchRestaurants } from "@/api/RestaurantApi";
+import { useGetBestsellers, useSearchRestaurants } from "@/api/RestaurantApi";
+import { useLocationCity } from "@/context/LocationContext";
 import { SearchState } from "./SearchPage";
-import { MapPin } from "lucide-react";
-import { useState } from "react";
+import { onImageError } from "@/lib/imageFallback";
 import { Link, useNavigate } from "react-router-dom";
+
+const money = (minor: number) => `£${(minor / 100).toFixed(2)}`;
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { cities } = useGetCities();
-  // remember the customer's chosen delivery city
-  const [city, setCity] = useState(
-    () => localStorage.getItem("deliverCity") || "London"
-  );
+  // shared "deliver to" city (chosen in the navbar)
+  const { city } = useLocationCity();
 
   const searchState: SearchState = {
     searchQuery: "",
     page: 1,
     selectedCuisines: [],
-    sortOption: "averageRating", // show the best-rated first
+    sortOption: "averageRating",
   };
   const { results, isLoading } = useSearchRestaurants(searchState, city);
-
-  const changeCity = (c: string) => {
-    setCity(c);
-    localStorage.setItem("deliverCity", c);
-  };
+  const { bestsellers } = useGetBestsellers(city);
 
   const handleSearchSubmit = (v: SearchForm) => {
     navigate(`/search/${v.searchQuery}`);
   };
-
-  const cityOptions = cities && cities.length ? cities : [city];
 
   return (
     <div className="flex flex-col gap-12">
@@ -41,25 +34,9 @@ const HomePage = () => {
         <h1 className="text-5xl font-bold tracking-tight text-orange-600">
           Tuck into a takeaway today
         </h1>
-        <span className="text-xl">Food is just a click away!</span>
-
-        {/* Deliver-to location selector */}
-        <div className="flex items-center justify-center gap-2 text-lg">
-          <MapPin className="text-orange-500" />
-          <span className="font-semibold">Deliver to</span>
-          <select
-            value={city}
-            onChange={(e) => changeCity(e.target.value)}
-            className="rounded-md border-2 border-orange-500 bg-white px-3 py-1 font-bold text-orange-600"
-          >
-            {cityOptions.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-
+        <span className="text-xl">
+          Showing food in <span className="font-bold text-orange-600">{city}</span> — change it from the top bar.
+        </span>
         <SearchBar
           searchQuery=""
           placeHolder="Search by city or town"
@@ -67,7 +44,41 @@ const HomePage = () => {
         />
       </div>
 
-      {/* Restaurants in the chosen city — shown immediately, no extra search */}
+      {/* Bestseller dishes in the chosen city */}
+      {bestsellers && bestsellers.length > 0 && (
+        <div>
+          <h2 className="mb-4 text-2xl font-bold tracking-tight">
+            🔥 Bestsellers in {city}
+          </h2>
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {bestsellers.map((dish, i) => (
+              <Link
+                key={i}
+                to={`/detail/${dish.restaurantId}`}
+                className="w-44 shrink-0 rounded-lg border transition hover:border-orange-300"
+              >
+                <img
+                  src={dish.imageUrl}
+                  alt={dish.name}
+                  onError={onImageError}
+                  className="h-28 w-full rounded-t-lg object-cover"
+                />
+                <div className="flex flex-col gap-0.5 p-2">
+                  <span className="truncate text-sm font-semibold">{dish.name}</span>
+                  <span className="text-sm font-bold text-orange-600">
+                    {money(dish.price)}
+                  </span>
+                  <span className="truncate text-xs text-gray-500">
+                    {dish.restaurantName}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Top restaurants in the chosen city */}
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight">
@@ -85,7 +96,7 @@ const HomePage = () => {
           <span>Loading restaurants...</span>
         ) : !results?.data?.length ? (
           <span className="text-gray-500">
-            No restaurants in {city} yet — try another city above.
+            No restaurants in {city} yet — pick another city from the top bar.
           </span>
         ) : (
           <div className="grid gap-6">

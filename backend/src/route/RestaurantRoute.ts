@@ -35,6 +35,7 @@ router.delete(
 
 // list of cities for the "Deliver to" selector (must be before /:restaurantId)
 router.get("/cities", RestaurantController.getCities);
+router.get("/bestsellers/:city", RestaurantController.getBestsellers);
 
 // /api/restaurant/serach/city
 router.get("/:restaurantId",

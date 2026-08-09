@@ -60,3 +60,26 @@ export const useGetCities = () => {
     const { data: cities } = useQuery("fetchCities", request);
     return { cities };
 };
+
+export type Bestseller = {
+    name: string;
+    price: number;
+    imageUrl?: string;
+    restaurantId: string;
+    restaurantName: string;
+};
+
+// Bestseller dishes in a given city (for the homepage row).
+export const useGetBestsellers = (city?: string) => {
+    const request = async (): Promise<Bestseller[]> => {
+        const response = await fetch(
+            `${API_BASE_URL}/api/restaurant/bestsellers/${city}`
+        );
+        if (!response.ok) throw new Error("Failed to get bestsellers");
+        return response.json();
+    };
+    const { data: bestsellers } = useQuery(["bestsellers", city], request, {
+        enabled: !!city,
+    });
+    return { bestsellers };
+};

@@ -97,8 +97,36 @@ const getCities = async (_req: Request, res: Response) => {
   }
 };
 
+// GET /api/restaurant/bestsellers/:city -> bestseller dishes from that city
+const getBestsellers = async (req: Request, res: Response) => {
+  try {
+    const city = req.params.city;
+    const items = await Restaurant.aggregate([
+      { $match: { city: new RegExp(`^${city}$`, "i") } },
+      { $unwind: "$menuItems" },
+      { $match: { "menuItems.isBestseller": true } },
+      {
+        $project: {
+          _id: 0,
+          name: "$menuItems.name",
+          price: "$menuItems.price",
+          imageUrl: "$menuItems.imageUrl",
+          restaurantId: "$_id",
+          restaurantName: "$restaurantName",
+        },
+      },
+      { $sample: { size: 12 } },
+    ]);
+    res.json(items);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 export default{
     searchRestaurant,
     getRestaurant,
     getCities,
+    getBestsellers,
 }
